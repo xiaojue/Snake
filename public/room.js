@@ -26,7 +26,7 @@
 			//console.log(data.id + ' is in the room');
 			serverid = data.id;
 			socket.emit('serverinit', serverid);
-            socket.emit('reopen');
+			socket.emit('reopen');
 			$('#number').text('当前房间人数0');
 			var ret = '';
 			var roomstatus = data.roomstatus;
@@ -36,7 +36,18 @@
 			$('#userstatus').html(ret);
 		});
 
+		snake.bind('died', 'room',function(data) {
+           socket.emit('died',data.name);  
+        });
+
+        snake.bind('gameover','room',function(data){
+           socket.emit('gameover');  
+        });
+
 		socket.on('system', function(json) {
+            if(json.type === 'reload'){
+                location.reload(); 
+            }
 			if (json.type === 'new') {
 				socket.emit('status', function(data) {
 					var users = [];
@@ -72,6 +83,7 @@
 			if (json.type === 'disconnect') {
 				//判断全离线 初始化
 				console.log('id ' + json.data.id + ' is out');
+                snake.removePlayer(json.data.id);
 				$('#number').text('当前房间人数' + objtoarr(json.data.roomstatus).length);
 				//如果一个用户掉了，要remove掉蛇实例
 			}

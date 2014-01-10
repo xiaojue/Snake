@@ -61,8 +61,12 @@ io.sockets.on('connection', function(socket) {
 		status: gamestatus
 	});
 
-    socket.on('gameover',function(users){
-         
+    socket.on('gameover',function(){
+        socket.broadcast.emit('system',{type:'reload'}); 
+    });
+
+    socket.on('died',function(id){
+        delete roomstatus[id];
     });
 
 	socket.broadcast.emit('system', {
@@ -75,7 +79,8 @@ io.sockets.on('connection', function(socket) {
     });
 
 	socket.on('serverinit', function(serverid) {
-		delete roomstatus[serverid];
+		//delete roomstatus[serverid];
+        roomstatus = {};
 	});
 
 	socket.on('status', function(fn) {

@@ -102,7 +102,6 @@
         },
 
         createBlock : function(l,t,c){
-            console.info(l,t);
             var cfg = this.config();
             var key = this.setKey(l,t);
             if(!this.__fill[key] || (!this.__fill[key].plugin && this.__map[key] == 0)) {
@@ -257,11 +256,13 @@
             this.evtFire('addplayer',[this.players]);
         },
 
-        removePlayers : function(playerName){
-            this.removeSnake(this.players[playerName].snake.body);
-            this.players[playerName] = null;
-            delete this.players[playerName];
-            this.alives --
+        removePlayer : function(playerName){
+            if(this.players[playerName]){
+                this.removeSnake(this.players[playerName].snake.body);
+                this.players[playerName] = null;
+                delete this.players[playerName];
+                this.alives --
+            }
         },
 
         removeSnake : function(snakeBody){
