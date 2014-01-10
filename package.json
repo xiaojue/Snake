@@ -1,0 +1,26 @@
+{
+  "name": "snake",
+  "version": "0.0.1",
+  "author": {
+    "name": "xiaojue",
+    "email": "designsor@gmail.com",
+    "url": "http://tuer.me/user/profile/designsor"
+  },
+  "description": "a snake online game",
+  "keywords": [
+    "snake",
+    "online game"
+  ],
+  "main": "./server.js",
+  "dependencies": {
+    "express":"*",
+    "socket.io":"*",
+    "q":"*",
+    "commander":"*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lithe/snake"
+  },
+  "license": "MIT"
+}
