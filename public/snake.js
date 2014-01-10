@@ -38,7 +38,7 @@
             activeCssList : ['a','b','c'],
             allowBack : false,
             speed : 400,
-            score : 3, //每吃一个食物所加的分数,
+            score : 1, //每吃一个食物所加的分数,
             range : 3, //出现特殊食物的机率
             maxUsers : 5
         };
@@ -441,7 +441,7 @@
                         }
                     }
 
-                    if(maybeFood.plugin) { //吃食物
+                    if(maybeFood && maybeFood.plugin) { //吃食物
                         eated = this.eatFood(player,player.snake,maybeFood);
                     } 
                     if(!eated) {
