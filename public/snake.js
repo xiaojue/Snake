@@ -112,10 +112,11 @@
             var key = this.setKey(l,t);
             if(!this.__fill[key]) {
                 this.__isDied[key] = true;
+                return;
             }
             this.__fill[key].className = c || '';
             this.__map[key] = 0;
-            this.__isDied[true] = 0;
+            this.__isDied[true] = true;
             return this.__fill[key];
         },
 
