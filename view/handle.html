@@ -80,12 +80,12 @@
 
             $(function(){
                 var name = getName();
-                var socket = io.connect('http://172.16.121.168:5566');
+                var socket = io.connect('http://172.16.121.205:5566');
                 var clientid;
                 function updateReady(roomstatus){
                     var ret = '';
                     for (var i in roomstatus) {
-                        ret += roomstatus[i].name + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
+                        if(roomstatus[i].name) ret += roomstatus[i].name + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
                     }
                     $('#userstatus').html(ret);
                 }
