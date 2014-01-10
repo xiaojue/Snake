@@ -134,11 +134,6 @@ io.sockets.on('connection', function(socket) {
 	});
 	socket.on('disconnect', function() {
 		delete roomstatus[id];
-        if(objtoarr(roomstatus).length === 0){
-		    socket.broadcast.emit('system', {
-                type:'allout'
-            });
-        }
 		socket.broadcast.emit('system', {
 			type: 'disconnect',
 			data: {

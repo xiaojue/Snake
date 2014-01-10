@@ -42,13 +42,11 @@
 
         snake.bind('gameover','room',function(data){
            socket.emit('gameover');  
+           location.reload();
         });
 
 		socket.on('system', function(json) {
-            if(json.type === 'reload'){
-                location.reload(); 
-            }
-			if (json.type === 'new') {
+			if (json.type == 'new') {
 				socket.emit('status', function(data) {
 					var users = [];
 					for (var i in data) {

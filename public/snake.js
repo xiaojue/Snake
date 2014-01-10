@@ -343,7 +343,7 @@
                     }
                 } else if(player.snake.status == 'died') {
                     var _player = extend({},player);
-                    this.removePlayers(player.name);
+                    this.removePlayer(player.name);
                     this.evtFire('died',[_player]);
                 }
             }

@@ -90,7 +90,7 @@
                     });
 
                     socket.on('system',function(json){
-                        if(json.type == 'reopen'){
+                        if(json.type == 'reopen' || json.type == 'reload'){
                             location.reload(); 
                         }
                         if(json.type == 'new'){
