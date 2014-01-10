@@ -39,7 +39,8 @@
             allowBack : false,
             speed : 400,
             score : 1, //每吃一个食物所加的分数,
-            range : 3 //出现特殊食物的机率
+            range : 3, //出现特殊食物的机率
+            maxUsers : 5
         };
 
         this.config = function(cfg){
@@ -64,7 +65,7 @@
         __foodNums : 0,
 
         __events : {},
-       
+
         players : {},
 
         alives : 0,
@@ -101,6 +102,7 @@
         },
 
         createBlock : function(l,t,c){
+            console.info(l,t);
             var cfg = this.config();
             var key = this.setKey(l,t);
             if(!this.__fill[key] || (!this.__fill[key].plugin && this.__map[key] == 0)) {
@@ -181,30 +183,39 @@
             this.removeFood(food);
             this.createFood();
         },
-        createSnake : function(length,head,direction,c){
+        createSnake : function(length, direction, id, c){
             var snakeBody = [];
+            var cfg = this.config();
             switch(direction) {
                 case 'up' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0],head[1] - length,c));
+                        var l = Math.max(parseInt(cfg.columns/cfg.maxUsers),1) * id;
+                        var t = cfg.rows - length;
+                        snakeBody.push(this.createBlock(l,t,c));
                     }
                 break;
                 
                 case 'down' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0],head[1] + length,c));
+                        var l = Math.max(parseInt(cfg.columns/cfg.maxUsers),1) * id;
+                        var t = length;
+                        snakeBody.push(this.createBlock(l,t ,c));
                     }
                 break;
 
                 case 'left' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0] - length,head[1],c));
+                        var l = cfg.columns - length;
+                        var t = Math.max(parseInt(cfg.rows/cfg.maxUsers),1) * id;
+                        snakeBody.push(this.createBlock(l,t,c));
                     }
                 break;
 
                 case 'right' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0] + length,head[1],c));
+                        var l = cfg.columns + length;
+                        var t = Math.max(parseInt(cfg.rows/cfg.maxUsers),1) * id;
+                        snakeBody.push(this.createBlock(l, t ,c));
                     }
                 break;
             }
@@ -214,12 +225,11 @@
         addPlayers : function(players){
             var _player = {
                 length : 2, //初始长度
-                head : [8,14], //初始坐标
                 direction : 'left',//初始方向
                 name : 'user' + +new Date, //玩家名称
                 scores : 0, //初始分数
                 cssName : 'defUser', //初始样式
-                baseScore : 1
+                baseScore : 1,
             };
             var cfg = this.config();
             var players = players || [{}];
@@ -229,23 +239,36 @@
                     this.players[item.name] = {
                         snake : {
                             cssName : item.cssName,
-                            body : this.createSnake(item.length,item.head,item.direction,item.cssName),
+                            body : this.createSnake(item.length,item.direction,this.alives + 1,item.cssName),
                             speed : cfg.speed,
                             status : 'alive',
                             direction : item.direction
                         },
                         name : item.name,
                         scores : item.scores,
-                        baseScore : item.baseScore //分数倍数
+                        baseScore : item.baseScore, //分数倍数
+                        id : this.alives + 1
                     };
                     this.alives ++;
                 }
+                
             }
+            
+            this.evtFire('addplayer',[this.players]);
         },
 
         removePlayers : function(playerName){
-            this.players[playerName].snake.status = 'died';
+            this.removeSnake(this.players[playerName].snake.body);
+            this.players[playerName] = null;
+            delete this.players[playerName];
             this.alives --
+        },
+
+        removeSnake : function(snakeBody){
+            for(var i = 0; i<snakeBody.length; i++) {
+                var item = snakeBody[i];
+                this.deleteBlock(item._offset.left,item._offset.top);
+            }
         },
 
         __fastInit : function(){ //测试用
@@ -262,16 +285,25 @@
             this.draw();
             var cfg = this.config();
             this.regBaseFood();
-            this.createFood();
+            
+            //this.createFood();
+            var _t = this;
         },
 
         snakeMove : function(){
             var cfg = this.config();
+            
+            if(this.alives == 0) {
+                this.evtFire('gameover');
+                this.pause();
+            }
             for(var i in this.players) {
                 var player = this.players[i];
+                if(!player) {
+                    continue;
+                }
                 if(player.snake.status == 'alive') {
                     var snake = player.snake.body;
-                    
                     var nextHead;
                     if(player.snake._direction) {
                         player.snake.direction = player.snake._direction;
@@ -285,6 +317,7 @@
                             nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top + 1, player.snake.cssName);
                         break;
                         case 'left' : 
+                            console.info(snake[0])
                             nextHead = this.createBlock(snake[0]._offset.left - 1,snake[0]._offset.top, player.snake.cssName);
                         break;
                         case 'right' : 
@@ -307,6 +340,10 @@
                         this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
                         snake.unshift(nextHead);
                     }
+                } else if(player.snake.status == 'died') {
+                    var _player = extend({},player);
+                    this.removePlayers(player.name);
+                    this.evtFire('died',[_player]);
                 }
             }
         },
@@ -315,6 +352,10 @@
         run : function(){
             var _t =this;
             var cfg = _t.config();
+            var cFood =  [0,1,2,2,3,3][this.alives];
+            for(var i = 0; i< cFood; i++) {
+                this.createFood();
+            }
             _t.evtFire('start');
             if(_t.__timer) {
                 clearInterval(this.__timer);
@@ -331,7 +372,6 @@
         },
         setDirection : function(snake,direction) { //设置移动方向
             var cfg  = this.config();
-            console.info(snake);
             if(snake.status != 'alive') {
                 return;
             }
@@ -373,7 +413,6 @@
             if(!this.__events[evt]) {
                 return;
             }
-
             
             for(var alias in  this.__events[evt]) {
                 var func = this.__events[evt][alias];

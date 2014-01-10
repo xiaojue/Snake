@@ -26,8 +26,7 @@
                         console.log(data)
                         console.log(user.head);
 						users.push({
-							name: user.id,
-							head: user.head
+							name: user.id
 						});
 					}
 					snake.addPlayers(users);
