@@ -70,6 +70,8 @@
 
         playerIds : [],
 
+        playerScores : {},
+
         alives : 0,
 
         setKey :  function(l,t){
@@ -180,6 +182,7 @@
             var cfg = this.config();
             food.plugin.effect.apply(this,arguments);
             player.scores += player.baseScore * food.plugin.score;
+            this.playerScores[player.name] = player.scores;
             this.evtFire('eat',arguments);
             this.removeFood(food);
             this.createFood();
@@ -255,7 +258,7 @@
                     if(!this.playerIds[i]) {
                         this.playerIds[i] = this.players[item.name];
                         this.players[item.name].id = i + 1;
-                        this.players[item.name].snake.body = this.createSnake(item.length,item.direction,i + 1,item.cssName);
+                        this.players[item.name].snake.body = this.createSnake(item.length,item.direction,i + 1,item.cssName + (i+1));
                         break;
                     }
                 }  
