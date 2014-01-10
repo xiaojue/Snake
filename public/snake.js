@@ -454,17 +454,17 @@
                         return ;
                     }
                     
-                    for(var pluginName in player.buff) {
-                        var buff = player.buff[pluginName];
-                        if(buff) {
-                            if(buff.fp == 0 && typeof buff.unEffect == 'function') {
-                                buff.unEffect.apply(this,[player,player.snake]);
-                                buff[pluginName] = undefined;
-                                delete buff[pluginName];
-                            } 
-                            buff.fp --;
-                        }
-                    }
+                    //for(var pluginName in player.buff) {
+                    //    var buff = player.buff[pluginName];
+                    //    if(buff) {
+                    //        if(buff.fp == 0 && typeof buff.unEffect == 'function') {
+                    //            buff.unEffect.apply(this,[player,player.snake]);
+                    //            buff[pluginName] = undefined;
+                    //            delete buff[pluginName];
+                    //        } 
+                    //        buff.fp --;
+                    //    }
+                    //}
                     
                     if(maybeFood && maybeFood.plugin) { //吃食物
                         eated = this.eatFood(player,player.snake,maybeFood);
