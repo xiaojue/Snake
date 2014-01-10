@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>snake online game</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/snake.js"></script>
+        <style>
+            .snake {
+                background : #ccc;
+            }
+            .a {background : red}
+            .b {background : green}
+            .c {background : yellow}
+        </style>
+    </head>
+    <body>
+        <div id="hehe"></div>
+        <div id="status"></div>
+        <div id="currentrank"></div>
+        <div id="lifebar"></div>
+        <script>
+            var snake = new Snake;
+            snake.config({
+                containerId : 'hehe'
+            });
+
+            snake.__fastInit();
+
+            document.onkeydown = function(e){
+                var s = snake.players['user1'].snake;
+                console.info(e.keyCode)
+                snake.setDirection(s,{'37' : 'left', '38' : 'up',  '39' : 'right', '40' : 'down'}[e.keyCode]); 
+            }
+        </script>
+        <script src="room.js"></script>
+    </body>
+</html>
