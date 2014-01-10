@@ -2,7 +2,8 @@
     <head>
         <meta charset="utf-8">
         <title>snake online game</title>
-        <script src="snake.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/snake.js"></script>
         <style>
             .snake {
                 background : #ccc;
@@ -17,7 +18,7 @@
         <div id="status"></div>
         <div id="currentrank"></div>
         <div id="lifebar"></div>
-        <script >
+        <script>
             var snake = new Snake;
             snake.config({
                 containerId : 'hehe'
@@ -31,5 +32,6 @@
                 snake.setDirection(s,{'37' : 'left', '38' : 'up',  '39' : 'right', '40' : 'down'}[e.keyCode]); 
             }
         </script>
+        <script src="room.js"></script>
     </body>
 </html>
