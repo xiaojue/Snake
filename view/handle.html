@@ -2,35 +2,55 @@
     <head>
         <meta charset="utf-8">
         <title>snake handle</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta content="yes" name="apple-mobile-web-app-capable"/>
+        <meta content="telephone=no" name="format-detection"/>
         <script src="/jquery-1.10.2.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <style>
+            #status{
+                border:#333 solid 1px; 
+            }
+            #handlebar{
+                margin-top:10px;
+                position:relative; 
+            }
             #top,#left,#right,#down{
                 position:absolute;
-                width:50px;
-                height:50px;
+                width:100px;
+                height:100px;
                 border:#333 solid 1px;
             }
             #top{
-                left:50px; 
+                left:100px; 
                 top:0px;
             }
             #left{
                 left:0px; 
-                top:50px;
+                top:100px;
             }
             #right{
-                left:100px; 
-                top:50px;
+                left:200px; 
+                top:100px;
             }
             #down{
-                left:50px; 
-                top:100px;
+                left:100px; 
+                top:200px;
             }
         </style>
     </head>
     <body>
-        <div id="status"></div>
+        <div id="status">
+            <span id="number"></span> 
+            <br>
+            <span id="current"></span> 
+            <br>
+            <span id="gamestatus"></span> 
+            <br>
+            <span id="userstatus"></span> 
+            <br>
+            <button id="ready">确认准备</button>
+        </div>
         <div id="handlebar">
             <div id="top"></div> 
             <div id="right"></div> 
@@ -40,19 +60,78 @@
             <div id="start"></div> 
         </div>
         <script>
-            var socket = io.connect('http://172.16.121.168:5566');
-            socket.on('connect',function(){
-                $('#top').bind('touchstart',function(){
-                    socket.emit('top');             
-                }); 
-                $('#right').bind('touchstart',function(){
-                    socket.emit('right');             
-                });
-                $('#down').bind('touchstart',function(){
-                    socket.emit('down');             
-                });
-                $('#left').bind('touchstart',function(){
-                    socket.emit('left');             
+            function objtoarr(obj){
+                var ret = [];
+                for(var i in obj){
+                    ret.push(obj[i]); 
+                } 
+                return ret;
+            }
+
+            $(function(){
+                var socket = io.connect('http://172.16.121.205:5566');
+                var clientid;
+                socket.on('connect',function(){
+                    socket.on('open',function(data){
+                        clientid = data.id;
+                        $('#current').text('当前id:'+clientid); 
+                        $('#number').text('当前房间人数:'+objtoarr(data.roomstatus).length);
+                        var statusmsg = '准备中';
+                        if(data.status){
+                            statusmsg = '进行中'; 
+                        }
+                        var ret = '';
+                        var roomstatus = data.roomstatus;
+                        for(var i in roomstatus){
+                            ret += i+':'+(roomstatus[i].isready ? '已准备': '未准备') + '<br>'; 
+                        }
+                        $('#userstatus').html(ret);
+                        $('#gamestatus').text('当前游戏状态:'+statusmsg);
+                    });
+
+                    socket.on('system',function(json){
+                        if(json.type == 'reopen'){
+                            location.reload(); 
+                        }
+                        if(json.type == 'new'){
+                            socket.emit('status',function(data){
+                                var users = objtoarr(data);
+                                $('#number').text('当前房间人数:'+users.length);
+                            }); 
+                            var ret = '';
+                            var roomstatus = json.data;
+                            for(var i in roomstatus){
+                                ret += i+':'+(roomstatus[i].isready ? '已准备': '未准备') + '<br>'; 
+                            }
+                            $('#userstatus').html(ret);
+                        }
+                    });
+
+                    $('#ready').bind('touchstart',function(){
+                        var disabled = $(this).attr('disabled');
+                        if(!disabled){
+                            $(this).attr('disabled',true);
+                            $(this).text('已准备');
+                            socket.emit('isready',clientid);
+                        }
+                        return false; 
+                    });
+                    $('#top').bind('touchstart',function(){
+                        socket.emit('top');             
+                        return false; 
+                    }); 
+                    $('#right').bind('touchstart',function(){
+                        socket.emit('right');             
+                        return false; 
+                    });
+                    $('#down').bind('touchstart',function(){
+                        socket.emit('down');             
+                        return false; 
+                    });
+                    $('#left').bind('touchstart',function(){
+                        socket.emit('left');             
+                        return false; 
+                    });
                 });
             });
         </script>
