@@ -94,6 +94,10 @@
                     socket.on('open',function(data){
                         clientid = data.id;
                         var roomstatus = data.roomstatus;
+                        if(objtoarr(roomstatus).length >= 5){
+                            alert('当前用户超过限制，稍后再来玩吧！'); 
+                            location.href = '/rank';
+                        }
                         if(name){
                             socket.emit('setname',{id:clientid,name:name}); 
                         }
