@@ -37,7 +37,7 @@
             defCss : 'snake',
             //activeCssList : ['a','b','c'],
             allowBack : false,
-            speed : 400,
+            speed : 350,
             score : 5, //每吃一个食物所加的分数,
             range : 3, //出现特殊食物的机率
             maxUsers : 5
