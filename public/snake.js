@@ -32,14 +32,14 @@
         var _default = {
             columns : 25,
             rows : 25,
-            unitLength : 15,
+            unitLength : 20,
             containerId : '',
             defCss : 'snake',
             activeCssList : ['a','b','c'],
             allowBack : false,
             speed : 400,
-            score : 1, //每吃一个食物所加的分数,
-            range : 5, //出现特殊食物的机率
+            score : 3, //每吃一个食物所加的分数,
+            range : 3, //出现特殊食物的机率
             maxUsers : 5
         };
 
@@ -203,7 +203,10 @@
             console.info(player.scores);
             this.playerScores[player.name] = player.scores;
             this.evtFire('eat',arguments);
-            this.createFood();
+            var cFood =  [0,1,2,2,3,3][this.alives];
+            if(this.__foodNums < cFood) {
+                this.createFood();
+            }
             return eated;
         },
         createSnake : function(length, direction, id, c){
@@ -333,35 +336,35 @@
 
         loadAllFood : function(){
             var _t =this;
-            //this.regFood({
-            //    name : 'disFood',
-            //    fp : 0,
-            //    effect : function(player,snake,food){
-            //        var _snake = snake.body
-            //        if(_snake.length >1) {
-            //            var disBlock = _snake.pop()
-            //            this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
-            //        }
-            //    },
-            //    score : 0,
-            //    cssName : 'c',
-            //    info : '如果蛇身长度大于2，则蛇身长度－1。'
-            //});
+            this.regFood({
+                name : 'disFood',
+                fp : 0,
+                effect : function(player,snake,food){
+                    var _snake = snake.body
+                    if(_snake.length >1) {
+                        var disBlock = _snake.pop()
+                        this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
+                    }
+                },
+                score : 0,
+                cssName : 'c',
+                info : '如果蛇身长度大于2，则蛇身长度－1。'
+            });
 
-            //this.regFood({
-            //    name : 'goodFood',
-            //    fp : 0,
-            //    effect : function(player,snake,food){
-            //        var l = food._offset.left,t = food._offset.top;
-            //        var key = this.setKey(l,t);
-            //        var block = this.createBlock(l,t,snake.cssName);
-            //        snake.body.unshift(block);
-            //        return true;
-            //    },
-            //    score : 2,
-            //    cssName : 'a',
-            //    info : '＋1长度，＋2个基本分数'
-            //});
+            this.regFood({
+                name : 'goodFood',
+                fp : 0,
+                effect : function(player,snake,food){
+                    var l = food._offset.left,t = food._offset.top;
+                    var key = this.setKey(l,t);
+                    var block = this.createBlock(l,t,snake.cssName);
+                    snake.body.unshift(block);
+                    return true;
+                },
+                score : 2,
+                cssName : 'a',
+                info : '＋1长度，＋2个基本分数'
+            });
             this.regFood({
                 name : 'apple',
                 fp : 25,
