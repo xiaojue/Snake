@@ -14,6 +14,7 @@
   "main": "./server.js",
   "dependencies": {
     "express":"*",
+    "ejs":"*",
     "socket.io":"*",
     "q":"*",
     "commander":"*"
