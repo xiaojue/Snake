@@ -102,7 +102,7 @@
 			}
 			if (json.type === 'disconnect') {
 				//判断全离线 初始化
-				alert('id ' + json.data.roomstatus[json.data.id] + ' is out');
+				//alert('id ' + json.data.roomstatus[json.data.id] + ' is out');
                 snake.removePlayer(json.data.id);
 				$('#number').text('当前房间人数' + objtoarr(json.data.roomstatus).length);
 				//如果一个用户掉了，要remove掉蛇实例
