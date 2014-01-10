@@ -82,7 +82,7 @@
 				//判断全离线 初始化
 				console.log('id ' + json.data.id + ' is out');
                 snake.removePlayer(json.data.id);
-                console.log(json.data.roomstatus);
+                console.log('remove'+json.data.id);
 				$('#number').text('当前房间人数' + objtoarr(json.data.roomstatus).length);
 				//如果一个用户掉了，要remove掉蛇实例
 			}

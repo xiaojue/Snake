@@ -143,6 +143,16 @@ io.sockets.on('connection', function(socket) {
             }
 		});
 	});
+    socket.on('offline',function(){
+		delete roomstatus[id];
+		socket.broadcast.emit('system', {
+			type: 'disconnect',
+			data: {
+                id:id,
+                roomstatus:roomstatus
+            }
+		});
+    });
 });
 
 server.listen(port);

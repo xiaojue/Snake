@@ -208,6 +208,7 @@
                     while(length --) {
                         var l = cfg.columns - length;
                         var t = Math.max(parseInt(cfg.rows/cfg.maxUsers),1) * id;
+                        console.log(l,t);
                         snakeBody.push(this.createBlock(l,t,c));
                     }
                 break;
@@ -242,7 +243,6 @@
                 this.players[item.name] = {
                     snake : {
                         cssName : item.cssName,
-                        body : this.createSnake(item.length,item.direction,this.alives + 1,item.cssName),
                         speed : cfg.speed,
                         status : 'alive',
                         direction : item.direction
@@ -255,6 +255,7 @@
                     if(!this.playerIds[i]) {
                         this.playerIds[i] = this.players[item.name];
                         this.players[item.name].id = i + 1;
+                        this.players[item.name].snake.body = this.createSnake(item.length,item.direction,i + 1,item.cssName);
                         break;
                     }
                 }  

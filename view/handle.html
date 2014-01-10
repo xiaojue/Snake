@@ -132,6 +132,9 @@
                         socket.emit('left');             
                         return false; 
                     });
+                    $(window).bind('beforeunload',function(){
+                        socket.emit('offline');
+                    });
                 });
             });
         </script>
