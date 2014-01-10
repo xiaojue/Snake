@@ -32,7 +32,7 @@
         var _default = {
             columns : 25,
             rows : 25,
-            unitLength : 15,
+            unitLength : 20,
             containerId : '',
             defCss : 'snake',
             activeCssList : ['a','b','c'],
@@ -203,7 +203,10 @@
             console.info(player.scores);
             this.playerScores[player.name] = player.scores;
             this.evtFire('eat',arguments);
-            this.createFood();
+            var cFood =  [0,1,2,2,3,3][this.alives];
+            if(this.__foodNums < cFood) {
+                this.createFood();
+            }
             return eated;
         },
         createSnake : function(length, direction, id, c){
@@ -438,7 +441,7 @@
                         }
                     }
 
-                    if(maybeFood.plugin) { //吃食物
+                    if(maybeFood && maybeFood.plugin) { //吃食物
                         eated = this.eatFood(player,player.snake,maybeFood);
                     } 
                     if(!eated) {
