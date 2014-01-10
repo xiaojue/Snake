@@ -52,7 +52,8 @@
 					for (var i in data) {
 						var user = data[i];
 						users.push({
-							name: user.id
+							name: user.id,
+                            cssName : 'users'
 						});
 					}
 					snake.addPlayers(users);

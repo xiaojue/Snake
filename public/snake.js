@@ -255,7 +255,7 @@
                     if(!this.playerIds[i]) {
                         this.playerIds[i] = this.players[item.name];
                         this.players[item.name].id = i + 1;
-                        this.players[item.name].snake.body = this.createSnake(item.length,item.direction,i + 1,item.cssName);
+                        this.players[item.name].snake.body = this.createSnake(item.length,item.direction,i + 1,item.cssName + (i+1));
                         break;
                     }
                 }  
