@@ -252,7 +252,7 @@
                     scores : item.scores,
                     baseScore : item.baseScore, //分数倍数
                 };
-                for(var i = 0; i< cfg.maxUsers, i++) {
+                for(var i = 0; i< cfg.maxUsers; i++) {
                     if(!this.playerIds[i]) {
                         this.playerIds[i] = this.players[item.name];
                         this.players[item.name].id = i;
