@@ -25,7 +25,7 @@
             });
 
             snake.__fastInit();
-
+            snake.go();
             document.onkeydown = function(e){
                 var s = snake.players['user1'].snake;
                 console.info(e.keyCode)

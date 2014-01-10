@@ -293,7 +293,6 @@
                         this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
                         snake.unshift(nextHead);
                     }
-
                 }
             }
         },
