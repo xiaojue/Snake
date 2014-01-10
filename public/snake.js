@@ -70,6 +70,8 @@
 
         playerIds : [],
 
+        playerScors : {},
+
         alives : 0,
 
         setKey :  function(l,t){
@@ -180,6 +182,7 @@
             var cfg = this.config();
             food.plugin.effect.apply(this,arguments);
             player.scores += player.baseScore * food.plugin.score;
+            this.playerScors[player.name] = player.scores;
             this.evtFire('eat',arguments);
             this.removeFood(food);
             this.createFood();
