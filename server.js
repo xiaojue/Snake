@@ -84,7 +84,7 @@ io.sockets.on('connection', function(socket) {
 	socket.on('left', function() {
         socket.broadcast.emit('system',{
             type:'left',
-            id:id 
+            data:roomstatus[id]
         });
     });
     socket.on('disconnect', function() {

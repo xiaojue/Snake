@@ -13,6 +13,7 @@
 		socket.on('open', function(data) {
 			console.log(data.roomstatus);
 			console.log(data.id + ' is in the room');
+            serverid = data.id;
 		});
 
 		socket.on('system', function(json) {
@@ -36,16 +37,16 @@
 				console.log('id ' + json.data + ' is out');
 			}
 			if (json.type == 'top') {
-				snake.setDirection(snake.players[json.id], 'up');
+				snake.setDirection(snake.players[json.data.id].snake, 'up');
 			}
 			if (json.type == 'right') {
-				snake.setDirection(snake.players[json.id], 'right');
+				snake.setDirection(snake.players[json.data.id].snake, 'right');
 			}
 			if (json.type == 'down') {
-				snake.setDirection(snake.players[json.id], 'down');
+				snake.setDirection(snake.players[json.data.id].snake, 'down');
 			}
 			if (json.type == 'left') {
-				snake.setDirection(snake.players[json.id], 'left');
+				snake.setDirection(snake.players[json.data.id].snake, 'left');
 			}
 		});
 	});

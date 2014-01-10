@@ -103,7 +103,6 @@
         createBlock : function(l,t,c){
             var cfg = this.config();
             var key = this.setKey(l,t);
-            console.info(this.__fill[key],(!this.__fill[key].plugin && this.__map[key]));
             if(!this.__fill[key] || (!this.__fill[key].plugin && this.__map[key] == 0)) {
                 return null;
             }
@@ -332,6 +331,7 @@
         },
         setDirection : function(snake,direction) { //设置移动方向
             var cfg  = this.config();
+            console.info(snake);
             if(snake.status != 'alive') {
                 return;
             }
