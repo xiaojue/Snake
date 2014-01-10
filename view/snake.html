@@ -6,16 +6,34 @@
         <script src="/socket.io/socket.io.js"></script>
         <script src="/snake.js"></script>
         <style>
+            #hehe {
+                border : 1px solid #ccc;
+                height: auto;
+                width : auto;
+                padding : 0px;
+                margin : 0px;
+            }
             .snake {
-                background : #ccc;
+                padding : 0px;
+                margin : 0px;
             }
             .a {background : red}
             .b {background : green}
             .c {background : yellow}
+            .defUser {
+                color : green;
+                border-radius: 5px;
+                box-shadow:0px 2px 4px #3a3a3a;
+            }
         </style>
     </head>
     <body>
-        <div id="hehe"></div>
+        <div id="hehe" style="height:100%;overflow:hidden"></div>
+        <div style="clear:both;height:33px;float:right">
+        <button onclick="snake.run()">开始</button>
+        <button onclick="snake.pause()">暂停</button>
+        </div>
+        
         <div id="status"></div>
         <div id="currentrank"></div>
         <div id="lifebar"></div>
@@ -26,9 +44,10 @@
             });
 
             snake.__fastInit();
-
             document.onkeydown = function(e){
-                var s = snake.players['user1'].snake;
+                for(var u in snake.players) {
+                    var s = snake.players[u].snake;
+                }
                 console.info(e.keyCode)
                 snake.setDirection(s,{'37' : 'left', '38' : 'up',  '39' : 'right', '40' : 'down'}[e.keyCode]); 
             }

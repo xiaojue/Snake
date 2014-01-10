@@ -30,9 +30,9 @@
     }
     var Snake = function(cfg){
         var _default = {
-            columns : 15,
-            rows : 15,
-            unitLength : 10,
+            columns : 25,
+            rows : 25,
+            unitLength : 15,
             containerId : '',
             defCss : 'snake',
             activeCssList : ['a','b','c'],
@@ -60,6 +60,10 @@
         __foodPlugins : [],
 
         __timer  : null,
+
+        __foodNums : 0,
+
+        __events : {},
        
         players : {},
 
@@ -76,34 +80,33 @@
                 return;
             }
 
-            for(var i = 1; i <= cfg.columns; i ++) {
-                for(var j = 1; j <= cfg.rows ; j++) {
+            for(var j = 1; j <= cfg.rows; j ++) {
+                for(var i = 1; i <= cfg.columns ; i++) {
                     var key = this.setKey(i,j);
                     var span = document.createElement('span');
                     span.className = cfg.defCss;
                     span.style.display = 'inline-block';
                     span.style.width = cfg.unitLength + 'px';
                     span.style.height = cfg.unitLength + 'px';
-                    span.style.position = 'absolute';
-                    span.style.left =  i*cfg.unitLength +'px'
-                    span.style.top =  j*cfg.unitLength +'px'
-
+                    
                     this.__fill[key] = span;
+                    this.__fill[key]._offset = {left : i, top :j};
                     this.__map[key] = 1;
                     this.__keyMap.push(key);
                     container.appendChild(span);
                 }
             }
+            container.style.width = cfg.unitLength * cfg.columns + 'px'
+            container.style.height = cfg.unitLength * cfg.rows + 'px'
         },
 
         createBlock : function(l,t,c){
             var cfg = this.config();
             var key = this.setKey(l,t);
-            if(!key) {
+            if(!this.__fill[key] || (!this.__fill[key].plugin && this.__map[key] == 0)) {
                 return null;
             }
-            this.__fill[key].className = c;
-            this.__fill[key]._offset = {left : l, top :t};
+            this.__fill[key].className = c || '';
             this.__map[key] = 0; 
             return this.__fill[key];
         },
@@ -111,7 +114,11 @@
         deleteBlock : function(l,t) {
             var cfg = this.config();
             var key = this.setKey(l,t);
+            if(!this.__fill[key]) {
+                return;
+            }
             this.__fill[key].className = cfg.defCss;
+            this.__fill[key].plugin = null;
             this.__map[key] = 1;
         },
 
@@ -128,58 +135,76 @@
             this.__foodPlugins.push(o);
         },
         
-        regBaseFood : function(){
+        regBaseFood : function(json){
             var cfg = this.config();
-            this.__foodPlugins.unshift({
+            var _json = extend({
                 fp : 0,
-                effect : function(player,snake){
-                    console.info("hehe");
+                effect : function(player,snake,food){
+                    snake.body.unshift(food);
                 },
-                score : cfg.score
-            });
+                score : cfg.score,
+                cssName : 'b'
+            },json || {});
+            this.__foodPlugins.unshift(_json);
         },
         
         createFood : function(c){
             var cfg = this.config();
-            var fBody = this.randomBlock(c);
             var range = Math.ceil(Math.random()*10)
-            if(range <= cfg.range && this.__foodPlugins.length >1) {
+            var plugin;
+            if(range <= cfg.range && this.__foodPlugins.length >1) { 
                 var _food = this.__foodPlugins.concat([]);
                 _food.shift();
-                fBody.plugin = randomArray(_food);
+                plugin = randomArray(_food);
             } else {
-                fBody.plugin = this.__foodPlugins[0];
+                plugin = this.__foodPlugins[0]; 
             }
-            window.fbody =fBody;
+            var fBody = this.randomBlock(plugin.cssName);
+            fBody.plugin = plugin;
+            this.__foodNums ++;
             return fBody;
         },
+        removeFood : function(food){
+            this.deleteBlock(food);
+            this.__foodNums --;
+            food.plugin = null;
+            if(this.__foodNums <0) {
+                this.__foodNums = 0;
+            }
+        },
         eatFood : function(player,snake,food){
-            var cfg = this.config(); 
+
+            var cfg = this.config();
+            food.plugin.effect.apply(this,arguments);
+            player.scores += player.baseScore * food.plugin.score;
+            this.evtFire('eat',arguments);
+            this.removeFood(food);
+            this.createFood();
         },
         createSnake : function(length,head,direction,c){
             var snakeBody = [];
             switch(direction) {
                 case 'up' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0],head[1] - length));
+                        snakeBody.push(this.createBlock(head[0],head[1] - length,c));
                     }
                 break;
                 
                 case 'down' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0],head[1] + length));
+                        snakeBody.push(this.createBlock(head[0],head[1] + length,c));
                     }
                 break;
 
                 case 'left' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0] - length,head[1]));
+                        snakeBody.push(this.createBlock(head[0] - length,head[1],c));
                     }
                 break;
 
                 case 'right' : 
                     while(length --) {
-                        snakeBody.push(this.createBlock(head[0] + length,head[1]));
+                        snakeBody.push(this.createBlock(head[0] + length,head[1],c));
                     }
                 break;
             }
@@ -191,9 +216,9 @@
                 length : 2, //初始长度
                 head : [8,14], //初始坐标
                 direction : 'left',//初始方向
-                name : 'user1', //玩家名称
+                name : 'user' + +new Date, //玩家名称
                 scores : 0, //初始分数
-                cssName : '', //初始样式
+                cssName : 'defUser', //初始样式
                 baseScore : 1
             };
             var cfg = this.config();
@@ -203,6 +228,7 @@
                 if(!this.players[item.name]) {
                     this.players[item.name] = {
                         snake : {
+                            cssName : item.cssName,
                             body : this.createSnake(item.length,item.head,item.direction,item.cssName),
                             speed : cfg.speed,
                             status : 'alive',
@@ -236,46 +262,65 @@
                 var player = this.players[i];
                 if(player.snake.status == 'alive') {
                     var snake = player.snake.body;
-                    var disBlock = snake.pop()
+                    
                     var nextHead;
-                    this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
                     if(player.snake._direction) {
                         player.snake.direction = player.snake._direction;
                         player.snake._direction = null;
                     }
                     switch(player.snake.direction) {
                         case 'up' : 
-                            nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top - 1);
-                            snake.unshift(nextHead, snake.cssName);
+                            nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top - 1, player.snake.cssName);
                         break;
                         case 'down' : 
-                            snake.unshift(this.createBlock(snake[0]._offset.left,snake[0]._offset.top + 1, snake.cssName));
+                            nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top + 1, player.snake.cssName);
                         break;
                         case 'left' : 
-                            snake.unshift(this.createBlock(snake[0]._offset.left - 1,snake[0]._offset.top, snake.cssName));
+                            nextHead = this.createBlock(snake[0]._offset.left - 1,snake[0]._offset.top, player.snake.cssName);
                         break;
                         case 'right' : 
-                            snake.unshift(this.createBlock(snake[0]._offset.left + 1,snake[0]._offset.top, snake.cssName));
+                            nextHead = this.createBlock(snake[0]._offset.left + 1,snake[0]._offset.top, player.snake.cssName);
                         break;
                     }
+                    
+                    
+                    if(!nextHead) {
+                        console.info('game over');
+                        player.snake.status = 'died';
+                        return ;
+                    }
 
+                    if(nextHead.plugin) { //吃食物
+                        this.eatFood(player,player.snake,nextHead);
+                    } else {
+                        
+                        var disBlock = snake.pop()
+                        this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
+                        snake.unshift(nextHead);
+                    }
                 }
             }
         },
 
         //运动相关
-        go : function(){
+        run : function(){
             var _t =this;
             var cfg = _t.config();
+            _t.evtFire('start');
             _t.__timer = setInterval(function(){
-                _t.snakeMove(); 
+                _t.snakeMove();
+            _t.evtFire('starting');
             },cfg.speed);
         },
         pause : function () {
             clearInterval(this.__timer);
+            this.evtFire('pause');
         },
         setDirection : function(snake,direction) { //设置移动方向
             var cfg  = this.config();
+            if(snake.status != 'alive') {
+                return;
+            }
             var oldD = snake.direction, newD = direction;
             var rule = {
                 'up' : 1,
@@ -292,9 +337,38 @@
             }
             snake._direction = direction;
             return true;
+        },
+        
+        bind : function(evt, alias, handler){
+            if(!this.__events[evt]) {
+                this.__events[evt] = {};
+            }            
+            this.__events[evt][alias] = handler;
+        },
+        unbind : function(evt,alias){
+            if(!this.__events[evt]) {
+                return;
+            }
+            if(alias) {
+                this.__events[evt][alias] = null;    
+            } else {
+                this.__events[evt] = null;
+            }
+        },
+        evtFire : function(evt,data){
+            if(!this.__events[evt]) {
+                return;
+            }
+
+            
+            for(var alias in  this.__events[evt]) {
+                var func = this.__events[evt][alias];
+                if(typeof func == 'function') {
+                    this.__events[evt][alias].apply(this,data);
+                }
+            }
         }
     }
-
     window.Snake = Snake;
 } ());
 
