@@ -422,7 +422,7 @@
                     }
                     
                     var maybeFood = this.__fill[this.setKey(l,t)],eated = false;
-                    if(this.__isDied[this.setKey(l,t)]) {
+                    if(this.__isDied[this.setKey(l,t)] || !maybeFood) {
                         console.info('game over');
                         player.snake.status = 'died';
                         return ;
@@ -440,7 +440,7 @@
                             buff.fp --;
                         }
                     }
-
+                    
                     if(maybeFood && maybeFood.plugin) { //吃食物
                         eated = this.eatFood(player,player.snake,maybeFood);
                     } 
@@ -448,6 +448,7 @@
                         var disBlock = snake.pop()
                         this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
                         nextHead = this.createBlock(l,t, player.snake.cssName);
+                        
                         snake.unshift(nextHead);
                     } 
                 } else if(player.snake.status == 'died') {
