@@ -2,6 +2,32 @@
     <head>
         <meta charset="utf-8">
         <title>snake handle</title>
+        <script src="/jquery-1.10.2.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <style>
+            #top,#left,#right,#down{
+                position:absolute;
+                width:50px;
+                height:50px;
+                border:#333 solid 1px;
+            }
+            #top{
+                left:50px; 
+                top:0px;
+            }
+            #left{
+                left:0px; 
+                top:50px;
+            }
+            #right{
+                left:100px; 
+                top:50px;
+            }
+            #down{
+                left:50px; 
+                top:100px;
+            }
+        </style>
     </head>
     <body>
         <div id="status"></div>
@@ -13,5 +39,22 @@
             <div id="stop"></div> 
             <div id="start"></div> 
         </div>
+        <script>
+            var socket = io.connect('http://172.16.121.205:5566');
+            socket.on('connect',function(){
+                $('#top').bind('touchstart',function(){
+                    socket.emit('top');             
+                }); 
+                $('#right').bind('touchstart',function(){
+                    socket.emit('right');             
+                });
+                $('#down').bind('touchstart',function(){
+                    socket.emit('down');             
+                });
+                $('#left').bind('touchstart',function(){
+                    socket.emit('left');             
+                });
+            });
+        </script>
     </body>
 </html>
