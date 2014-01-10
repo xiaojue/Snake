@@ -29,13 +29,19 @@ app.get('/handle', function(req, res, next) {
 });
 
 var roomstatus = {};
+var x=10;y=10;
 
 //游戏房间逻辑部分
 io.sockets.on('connection', function(socket) {
 
     var id = new Date().valueOf();
+    x++;
+    y++;
 
-    roomstatus[id] = {};
+    roomstatus[id] = {
+        id:id,
+        head:[x,y]
+    };
 
     socket.emit('open',{
         id:id,
@@ -60,19 +66,19 @@ io.sockets.on('connection', function(socket) {
 	socket.on('top', function() {
         socket.broadcast.emit('system',{
             type:'top',
-            id:id 
+            data:roomstatus[id]
         });
 	});
 	socket.on('right', function() {
         socket.broadcast.emit('system',{
             type:'right',
-            id:id 
+            data:roomstatus[id]
         });
     });
 	socket.on('down', function() {
         socket.broadcast.emit('system',{
             type:'down',
-            id:id 
+            data:roomstatus[id]
         });
     });
 	socket.on('left', function() {

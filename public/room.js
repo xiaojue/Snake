@@ -17,11 +17,13 @@
 		socket.on('system', function(json) {
 			if (json.type === 'new') {
 				socket.emit('status', function(data) {
-					//$('#status').text(data); 
 					var users = [];
 					for (var i in data) {
+                        var user = data[i];
+                        console.log(user.head);
 						users.push({
-							mame: i
+							name: user.id,
+							head: user.head
 						});
 					}
 					snake.addPlayers(users);
