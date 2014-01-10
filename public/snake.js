@@ -39,7 +39,7 @@
             allowBack : false,
             speed : 400,
             score : 1, //每吃一个食物所加的分数,
-            range : 3, //出现特殊食物的机率
+            range : 5, //出现特殊食物的机率
             maxUsers : 5
         };
 
@@ -57,6 +57,8 @@
         __map : {}, //此处记录块有没有被占用
 
         __keyMap : [],
+
+        __isDied : {},
 
         __foodPlugins : [],
 
@@ -108,11 +110,12 @@
         createBlock : function(l,t,c){
             var cfg = this.config();
             var key = this.setKey(l,t);
-            if(!this.__fill[key] || (!this.__fill[key].plugin && this.__map[key] == 0)) {
-                return null;
+            if(!this.__fill[key]) {
+                this.__isDied[key] = true;
             }
             this.__fill[key].className = c || '';
-            this.__map[key] = 0; 
+            this.__map[key] = 0;
+            this.__isDied[true] = 0;
             return this.__fill[key];
         },
 
@@ -125,6 +128,7 @@
             this.__fill[key].className = cfg.defCss;
             this.__fill[key].plugin = null;
             this.__map[key] = 1;
+            this.__isDied[key] = false;
         },
 
         randomBlock : function(c){
@@ -143,12 +147,18 @@
         regBaseFood : function(json){
             var cfg = this.config();
             var _json = extend({
+                name : 'baseFood',
                 fp : 0,
                 effect : function(player,snake,food){
-                    snake.body.unshift(food);
+                    var l = food._offset.left,t = food._offset.top;
+                    var key = this.setKey(l,t);
+                    var block = this.createBlock(l,t,snake.cssName);
+                    snake.body.unshift(block);
+                    return true;
                 },
                 score : cfg.score,
-                cssName : 'b'
+                cssName : 'b',
+                info : '基本的食物,＋1长度，＋1个基本分'
             },json || {});
             this.__foodPlugins.unshift(_json);
         },
@@ -166,6 +176,7 @@
             }
             var fBody = this.randomBlock(plugin.cssName);
             fBody.plugin = plugin;
+            this.__isDied[this.setKey(fBody._offset.left,fBody._offset.top)] = false;
             this.__foodNums ++;
             return fBody;
         },
@@ -178,14 +189,22 @@
             }
         },
         eatFood : function(player,snake,food){
-
             var cfg = this.config();
-            food.plugin.effect.apply(this,arguments);
-            player.scores += player.baseScore * food.plugin.score;
+            var plugin = extend({},food.plugin);
+            this.removeFood(food);
+            var eated = plugin.effect.apply(this,arguments);
+            if(plugin.fp > 0 && typeof plugin.unEffect == 'function') {
+                player.buff[plugin.name] = {
+                    fp : plugin.fp,
+                    unEffect : plugin.unEffect
+                }
+            }
+            player.scores += player.baseScore * plugin.score;
+            console.info(player.scores);
             this.playerScores[player.name] = player.scores;
             this.evtFire('eat',arguments);
-            this.removeFood(food);
             this.createFood();
+            return eated;
         },
         createSnake : function(length, direction, id, c){
             var snakeBody = [];
@@ -253,6 +272,7 @@
                     name : item.name,
                     scores : item.scores,
                     baseScore : item.baseScore, //分数倍数
+                    buff : []
                 };
                 for(var i = 0; i< cfg.maxUsers; i++) {
                     if(!this.playerIds[i]) {
@@ -311,6 +331,54 @@
             var _t = this;
         },
 
+        loadAllFood : function(){
+            var _t =this;
+            //this.regFood({
+            //    name : 'disFood',
+            //    fp : 0,
+            //    effect : function(player,snake,food){
+            //        var _snake = snake.body
+            //        if(_snake.length >1) {
+            //            var disBlock = _snake.pop()
+            //            this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
+            //        }
+            //    },
+            //    score : 0,
+            //    cssName : 'c',
+            //    info : '如果蛇身长度大于2，则蛇身长度－1。'
+            //});
+
+            //this.regFood({
+            //    name : 'goodFood',
+            //    fp : 0,
+            //    effect : function(player,snake,food){
+            //        var l = food._offset.left,t = food._offset.top;
+            //        var key = this.setKey(l,t);
+            //        var block = this.createBlock(l,t,snake.cssName);
+            //        snake.body.unshift(block);
+            //        return true;
+            //    },
+            //    score : 2,
+            //    cssName : 'a',
+            //    info : '＋1长度，＋2个基本分数'
+            //});
+            this.regFood({
+                name : 'apple',
+                fp : 25,
+                effect : function(player,snake,food){
+                    var cfg = this.config();
+                    player.baseScore = cfg.score * 2; 
+                },
+                unEffect : function(player,snake){
+                    var cfg = this.config();
+                    player.baseScore = cfg.score; 
+                },
+                score : 0,
+                cssName : 'd',
+                info : '25步内吃到的食物分数加倍'
+            });
+        },
+
         snakeMove : function(){
             var cfg = this.config();
             
@@ -325,41 +393,60 @@
                 }
                 if(player.snake.status == 'alive') {
                     var snake = player.snake.body;
-                    var nextHead;
+                    var nextHead,l,t;
                     if(player.snake._direction) {
                         player.snake.direction = player.snake._direction;
                         player.snake._direction = null;
                     }
                     switch(player.snake.direction) {
-                        case 'up' : 
-                            nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top - 1, player.snake.cssName);
+                        case 'up' :
+                            l =  snake[0]._offset.left;
+                            t =  snake[0]._offset.top - 1
                         break;
                         case 'down' : 
-                            nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top + 1, player.snake.cssName);
+                            l =  snake[0]._offset.left;
+                            t =  snake[0]._offset.top + 1
                         break;
                         case 'left' : 
-                            nextHead = this.createBlock(snake[0]._offset.left - 1,snake[0]._offset.top, player.snake.cssName);
+                            l =  snake[0]._offset.left -1;
+                            t =  snake[0]._offset.top
                         break;
                         case 'right' : 
-                            nextHead = this.createBlock(snake[0]._offset.left + 1,snake[0]._offset.top, player.snake.cssName);
+                            l =  snake[0]._offset.left +1;
+                            t =  snake[0]._offset.top
                         break;
                     }
                     
                     
-                    if(!nextHead) {
+                    var maybeFood = this.__fill[this.setKey(l,t)],eated = false;
+                    if(this.__isDied[this.setKey(l,t)]) {
                         console.info('game over');
                         player.snake.status = 'died';
                         return ;
                     }
+                    
+                    for(var pluginName in player.buff) {
+                        var buff = player.buff[pluginName];
+                        if(buff) {
+                            if(buff.fp == 0 && typeof buff.unEffect == 'function') {
+                                console.info(player.buff.unEffect)
+                                buff.unEffect.apply(this,[player,player.snake]);
+                                buff[pluginName] = undefined;
+                                delete buff[pluginName];
+                            } 
+                            buff.fp --;
+                        }
+                    }
 
-                    if(nextHead.plugin) { //吃食物
-                        this.eatFood(player,player.snake,nextHead);
-                    } else {
-                        
+                    if(maybeFood.plugin) { //吃食物
+                        eated = this.eatFood(player,player.snake,maybeFood);
+                    } 
+                    if(!eated) {
                         var disBlock = snake.pop()
                         this.deleteBlock( disBlock._offset.left,disBlock._offset.top);
+                        nextHead = this.createBlock(l,t, player.snake.cssName);
                         snake.unshift(nextHead);
-                    }
+                    } 
                 } else if(player.snake.status == 'died') {
                     var _player = extend({},player);
                     this.removePlayer(player.name);
