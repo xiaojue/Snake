@@ -274,6 +274,7 @@
         removePlayer : function(playerName){
             if(this.players[playerName]){
                 this.removeSnake(this.players[playerName].snake.body);
+                this.playerIds[this.players[playerName].id] = undefined;
                 this.players[playerName] = null;
                 delete this.players[playerName];
                 this.alives --
