@@ -204,8 +204,8 @@
             console.info(player.scores);
             this.playerScores[player.name] = player.scores;
             this.evtFire('eat',arguments);
-            var cFood =  [0,1,2,2,3,3][this.alives];
-            if(this.__foodNums < cFood) {
+            var cFood =  [0,1,2,2,3,4][this.alives];
+            if(this.__foodNums <= cFood) {
                 this.createFood();
             }
             return eated;
@@ -340,7 +340,7 @@
             this.regFood({
                 name : 'disFood',
                 fp : 0,
-                effect : function(player,snake,food){
+                effect : function(pluyer,snake,food){
                     var _snake = snake.body
                     if(_snake.length >1) {
                         var disBlock = _snake.pop()
@@ -463,7 +463,7 @@
         run : function(){
             var _t =this;
             var cfg = _t.config();
-            var cFood =  [0,1,2,2,3,3][this.alives];
+            var cFood =  [0,1,2,2,3,4][this.alives];
             for(var i = 0; i< cFood; i++) {
                 this.createFood();
             }
