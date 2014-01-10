@@ -4,6 +4,7 @@
 		snake.config({
 			containerId: 'hehe'
 		});
+        var serverid;
 
 		snake.init();
 
@@ -17,6 +18,7 @@
 		socket.on('system', function(json) {
 			if (json.type === 'new') {
 				socket.emit('status', function(data) {
+                    delete data[serverid];
 					var users = [];
 					for (var i in data) {
                         var user = data[i];
