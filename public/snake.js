@@ -219,9 +219,9 @@
                 break;
             }
             return snakeBody;
-        }, 
+        },
 
-        addPlayers : function(players){
+        addPlayer : function(player){
             var _player = {
                 length : 2, //初始长度
                 direction : 'left',//初始方向
@@ -231,29 +231,32 @@
                 baseScore : 1,
             };
             var cfg = this.config();
-            var players = players || [{}];
+            var item = extend(_playear,player || {});
+
+            if(!this.players[item.name]) {
+                this.players[item.name] = {
+                    snake : {
+                        cssName : item.cssName,
+                        body : this.createSnake(item.length,item.direction,this.alives + 1,item.cssName),
+                        speed : cfg.speed,
+                        status : 'alive',
+                        direction : item.direction
+                    },
+                    name : item.name,
+                    scores : item.scores,
+                    baseScore : item.baseScore, //分数倍数
+                    id : this.alives + 1
+                };
+                this.alives ++;
+                this.evtFire('addplayer',[this.players]);
+            }
+        },
+        
+        addPlayers : function(players){
             for(var p=0; p<players.length; p++){
-                var item = extend(_player,players[p]);
-                if(!this.players[item.name]) {
-                    this.players[item.name] = {
-                        snake : {
-                            cssName : item.cssName,
-                            body : this.createSnake(item.length,item.direction,this.alives + 1,item.cssName),
-                            speed : cfg.speed,
-                            status : 'alive',
-                            direction : item.direction
-                        },
-                        name : item.name,
-                        scores : item.scores,
-                        baseScore : item.baseScore, //分数倍数
-                        id : this.alives + 1
-                    };
-                    this.alives ++;
-                }
-                
+                this.addPlayer(players[p]) 
             }
             
-            this.evtFire('addplayer',[this.players]);
         },
 
         removePlayer : function(playerName){
@@ -318,7 +321,6 @@
                             nextHead = this.createBlock(snake[0]._offset.left,snake[0]._offset.top + 1, player.snake.cssName);
                         break;
                         case 'left' : 
-                            console.info(snake[0])
                             nextHead = this.createBlock(snake[0]._offset.left - 1,snake[0]._offset.top, player.snake.cssName);
                         break;
                         case 'right' : 
