@@ -17,10 +17,10 @@
 
 		var serverid;
         var gamestatus;
-
+        snake.loadAllFood();
 		snake.init();
 
-		var socket = io.connect('http://172.16.121.205:5566');
+		var socket = io.connect('http://172.16.121.168:5566');
 		//初始化房间信息- 剔除server id
 		socket.on('open', function(data) {
 			//console.log(data.roomstatus);
@@ -43,26 +43,60 @@
 		snake.bind('died', 'room',function(data) {
            socket.emit('died',data.name);  
         });
-
+        
+        var unit = snake.config().unitLength + 'px';
         function showRank(){
             var ret ='';
             console.log(snake.playerScores);
             for(var i in snake.playerScores){
-               var score = snake.playerScores[i];
-               ret += i +'：'+score+'<br>';
+                var score = snake.playerScores[i];
+                
+                ret += i +'：'+score+'<br>';
             }  
             $('#currentrank').html(ret);
         }
 
+        function showTips() {
+            var ret = [];
+            console.info(snake.__foodPlugins);
+            for(var i in snake.__foodPlugins) {
+                var item = snake.__foodPlugins[i];
+                ret.push('<span class="' , item.cssName , '" style="display:inline-block;height:', unit ,'; width : ', unit ,'"></span>'
+                     ,'<span style="display:inline-block">',item.info,'</span><br/>')
+            }
+            $('#pluginInfo').html(ret.join(''));
+        }
+
         snake.bind('eat','room',function(){
            showRank();  
+
         });
+
+        snake.bind('starting','room',function(){//加状态显示
+                //var ret = '';
+                //for(var i in snake.players) {
+                //    ret += '<p class='+snake.players[i].snake.cssName+'">'+i+':</p>';
+                //    if(snake.players[i].buff) {
+                //        console.info(snake.players[i].buff)
+                //        for(var ef in snake.players[i].buff) {
+                //            var buff = snake.players[i].buff[ef];
+                //            if(buff.fp >0 && typeof buff.unEffect == 'function') {
+                //                console.info(buff.fp);
+                //                ret+= ('<span class="' + snake.__foodPlugins[ef].cssName + '" style="display:inline-block;height:'+ unit +'; width : '+ unit +'"></span>');
+                //            }
+                //        } 
+                //    }
+                //}
+                //$('#buffstatus').html(ret);
+        })
 
         snake.bind('gameover','room',function(data){
            socket.emit('gameover');  
-           setTimeout(function(){
+           alert('game over!')
+
+           //setTimeout(function(){
              location.reload();
-           },3000);
+           //},3000);
         });
 
 		socket.on('system', function(json) {
@@ -95,6 +129,7 @@
 						snake.run();
                         //显示分数
                         showRank();
+                        showTips();
                         gamestatus = true;
 					}
 				},

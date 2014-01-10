@@ -17,10 +17,14 @@
                 padding : 0px;
                 margin : 0px;
             }
-            .a {background : red}
-            .b {background : green}
-            .c {background : yellow}
-            .d {background : #2ef93b}
+            .a,.b,.c,.d {
+                background : url(img/fruit.png)
+            }
+            .a {background-position : -41px 39px}
+            .b {background-position : -16px 39px}
+            .c {background-position : -16px 63px}
+            .d {background-position : -41px 63px}
+            
             .defUser,.user1,.user2,.user3,.user4,.user5 {
                 border-radius: 8px;
                 box-shadow:0px 2px 4px #3a3a3a;
@@ -28,36 +32,43 @@
             }
             .user1 {
                 background-color : yellow;
+                color : yellow;
             }
             .user2 {
                 background-color : green;
+                color : green;
             }
 
             .user3 {
                 background-color : pink;
+                color : pink;
             }
 
             .user4 {
                 background-color : red;
+                color : red;
             }
 
             .user5 {
                 background-color : blue;
+                color : blue;
             }
         </style>
     </head>
     <body>
-        <div id="hehe"></div>
-        <div style="clear:both;height:33px;float:right">
-        <!--<button onclick="snake.run()">开始</button>-->
-        <!--<button onclick="snake.pause()">暂停</button>-->
+        <div id="hehe" style="float:left;"></div>
+        <div style="height:100%;overflow:hidden;float:right">
+            <div id="number"></div>
+            <div id="userstatus"></div>
+            <div id="status"></div>
+
+            <div id="buffstatus"></div>
+            <div id="currentrank"></div>
+            <div id="pluginInfo" style="height:100%;overflow:hidden;"></div>
+            <div id="lifebar"></div>
         </div>
         
-        <div id="number"></div>
-        <div id="userstatus"></div>
-        <div id="status"></div>
-        <div id="currentrank"></div>
-        <div id="lifebar"></div>
+        
         <script src="/room.js"></script>
     </body>
 </html>
