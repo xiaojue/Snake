@@ -1,5 +1,5 @@
 (function() {
-    var extend = function ( t, s, b ) {
+    extend = function ( t, s, b ) {
         if (s) {
             for ( var k in s ) {
                 if (!b || !t.hasOwnProperty(k)) {
@@ -103,6 +103,7 @@
         createBlock : function(l,t,c){
             var cfg = this.config();
             var key = this.setKey(l,t);
+            console.info(this.__fill[key],(!this.__fill[key].plugin && this.__map[key]));
             if(!this.__fill[key] || (!this.__fill[key].plugin && this.__map[key] == 0)) {
                 return null;
             }

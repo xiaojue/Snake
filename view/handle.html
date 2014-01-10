@@ -40,7 +40,7 @@
             <div id="start"></div> 
         </div>
         <script>
-            var socket = io.connect('http://172.16.121.205:5566');
+            var socket = io.connect('http://172.16.121.168:5566');
             socket.on('connect',function(){
                 $('#top').bind('touchstart',function(){
                     socket.emit('top');             

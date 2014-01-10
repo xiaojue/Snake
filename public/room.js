@@ -7,7 +7,7 @@
 
 		snake.init();
 
-		var socket = io.connect('http://172.16.121.205:5566');
+		var socket = io.connect('http://172.16.121.168:5566');
 		//初始化房间信息
 		socket.on('open', function(data) {
 			console.log(data.roomstatus);
@@ -20,6 +20,7 @@
 					var users = [];
 					for (var i in data) {
                         var user = data[i];
+                        console.log(data)
                         console.log(user.head);
 						users.push({
 							name: user.id,
