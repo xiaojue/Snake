@@ -37,7 +37,7 @@
             defCss : 'snake',
             activeCssList : ['a','b','c'],
             allowBack : false,
-            speed : 800,
+            speed : 400,
             score : 1, //每吃一个食物所加的分数,
             range : 3 //出现特殊食物的机率
         };
@@ -252,7 +252,16 @@
             this.draw() //画布
             var cfg = this.config();
             this.regBaseFood();
-            this.addPlayers();//增加玩家
+            this.addPlayers({
+            
+            });//增加玩家
+            this.createFood();
+        },
+
+        init : function(){
+            this.draw();
+            var cfg = this.config();
+            this.regBaseFood();
             this.createFood();
         },
 
@@ -307,6 +316,9 @@
             var _t =this;
             var cfg = _t.config();
             _t.evtFire('start');
+            if(_t.__timer) {
+                clearInterval(this.__timer);
+            }
             _t.__timer = setInterval(function(){
                 _t.snakeMove();
             _t.evtFire('starting');
@@ -314,6 +326,7 @@
         },
         pause : function () {
             clearInterval(this.__timer);
+            this.__timer = null 
             this.evtFire('pause');
         },
         setDirection : function(snake,direction) { //设置移动方向
