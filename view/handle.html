@@ -5,8 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta content="yes" name="apple-mobile-web-app-capable"/>
         <meta content="telephone=no" name="format-detection"/>
-        <script src="/jquery-1.10.2.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
+        <script src="/zepto.min.js"></script>
+        <script src="/touch.js"></script>
         <style>
             #status{
                 border:#333 solid 1px; 
@@ -50,10 +51,12 @@
             <button id="ready">确认准备</button>
         </div>
         <div id="handlebar">
+            <!--
             <div id="top"></div> 
             <div id="right"></div> 
             <div id="down"></div> 
             <div id="left"></div> 
+            -->
             <div id="stop"></div> 
             <div id="start"></div> 
         </div>
@@ -70,7 +73,7 @@
                 var name = prompt("please type your name","");
                 if(!name || name == null || name === ""){
                     location.reload();
-                }else{
+                    }else{
                     return name; 
                 }
             }
@@ -129,6 +132,7 @@
                         }
                         return false; 
                     });
+                    /*
                     $('#top').bind('touchstart',function(){
                         socket.emit('top');             
                         return false; 
@@ -145,8 +149,24 @@
                         socket.emit('left');             
                         return false; 
                     });
+                    */
                     $(window).bind('beforeunload',function(){
                         socket.emit('offline');
+                    });
+                    $(document).bind('touchstart',function(){
+                        return false;
+                    });
+                    $(document).swipeUp(function(){
+                        socket.emit('top');             
+                    });
+                    $(document).swipeLeft(function(){
+                        socket.emit('left');             
+                    });
+                    $(document).swipeRight(function(){
+                        socket.emit('right');             
+                    });
+                    $(document).swipeDown(function(){
+                        socket.emit('down');             
                     });
                 });
             });
