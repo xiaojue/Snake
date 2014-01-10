@@ -116,6 +116,7 @@
                             updateReady(json.data);     
                         }
                         if(json.type == 'reopen' || json.type == 'reload'){
+                            alert(json.type);
                             location.reload(); 
                         }
                         if(json.type == 'new'){
