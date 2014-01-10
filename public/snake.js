@@ -239,7 +239,6 @@
                 return;
             }
             if(!this.players[item.name]) {
-                
                 this.players[item.name] = {
                     snake : {
                         cssName : item.cssName,
@@ -255,7 +254,7 @@
                 for(var i = 0; i< cfg.maxUsers; i++) {
                     if(!this.playerIds[i]) {
                         this.playerIds[i] = this.players[item.name];
-                        this.players[item.name].id = i;
+                        this.players[item.name].id = i + 1;
                         break;
                     }
                 }  
@@ -274,7 +273,7 @@
         removePlayer : function(playerName){
             if(this.players[playerName]){
                 this.removeSnake(this.players[playerName].snake.body);
-                this.playerIds[this.players[playerName].id] = undefined;
+                this.playerIds[this.players[playerName].id - 1] = undefined;
                 this.players[playerName] = null;
                 delete this.players[playerName];
                 this.alives --
