@@ -16,6 +16,7 @@
 		});
 
 		var serverid;
+        var gamestatus;
 
 		snake.init();
 
@@ -28,13 +29,16 @@
 			socket.emit('serverinit', serverid);
 			socket.emit('reopen');
 			$('#number').text('当前房间人数0');
+            updateReady(data.roomstatus);
+		});
+
+        function updateReady(roomstatus){
 			var ret = '';
-			var roomstatus = data.roomstatus;
 			for (var i in roomstatus) {
-				ret += i + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
+				ret += roomstatus[i].name + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
 			}
 			$('#userstatus').html(ret);
-		});
+        }
 
 		snake.bind('died', 'room',function(data) {
            socket.emit('died',data.name);  
@@ -42,8 +46,9 @@
 
         function showRank(){
             var ret ='';
+            console.log(snake.playerScores);
             for(var i in snake.playerScores){
-               var score = snake.playerScores[i].scores;
+               var score = snake.playerScores[i];
                ret += i +'：'+score+'<br>';
             }  
             $('#currentrank').html(ret);
@@ -61,6 +66,9 @@
         });
 
 		socket.on('system', function(json) {
+            if(json.type == 'updateReady'){
+                updateReady(json.data);     
+            }
 			if (json.type == 'new') {
 				socket.emit('status', function(data) {
 					var users = [];
@@ -74,12 +82,7 @@
 					snake.addPlayers(users);
 				});
 				$('#number').text('当前房间人数' + objtoarr(json.data).length);
-				var ret = '';
-				var roomstatus = json.data;
-				for (var i in roomstatus) {
-					ret += i + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
-				}
-				$('#userstatus').html(ret);
+                updateReady(json.data);
 			}
 			if (json.type === 'allready') {
 				var s = 5;
@@ -92,12 +95,18 @@
 						snake.run();
                         //显示分数
                         showRank();
+                        gamestatus = true;
 					}
 				},
 				1000);
 			}
 			if (json.type === 'disconnect') {
 				//判断全离线 初始化
+                if(gamestatus){
+                    socket.emit('gameover');
+                    location.reload();
+                    return; 
+                }
 				console.log('id ' + json.data.id + ' is out');
                 snake.removePlayer(json.data.id);
                 console.log('remove'+json.data.id);

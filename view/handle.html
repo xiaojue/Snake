@@ -45,8 +45,6 @@
             <br>
             <span id="current"></span> 
             <br>
-            <span id="gamestatus"></span> 
-            <br>
             <span id="userstatus"></span> 
             <br>
             <button id="ready">确认准备</button>
@@ -68,28 +66,48 @@
                 return ret;
             }
 
+            function getName(){
+                var name = prompt("please type your name","");
+                if(!name || name == null || name === ""){
+                    location.reload();
+                }else{
+                    return name; 
+                }
+            }
+
             $(function(){
+                var name = getName();
                 var socket = io.connect('http://172.16.121.205:5566');
                 var clientid;
+                function updateReady(roomstatus){
+                    var ret = '';
+                    for (var i in roomstatus) {
+                        ret += roomstatus[i].name + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
+                    }
+                    $('#userstatus').html(ret);
+                }
+
                 socket.on('connect',function(){
                     socket.on('open',function(data){
                         clientid = data.id;
-                        $('#current').text('当前id:'+clientid); 
-                        $('#number').text('当前房间人数:'+objtoarr(data.roomstatus).length);
-                        var statusmsg = '准备中';
-                        if(data.status){
-                            statusmsg = '进行中'; 
-                        }
-                        var ret = '';
                         var roomstatus = data.roomstatus;
-                        for(var i in roomstatus){
-                            ret += i+':'+(roomstatus[i].isready ? '已准备': '未准备') + '<br>'; 
+                        if(name){
+                            socket.emit('setname',{id:clientid,name:name}); 
                         }
-                        $('#userstatus').html(ret);
-                        $('#gamestatus').text('当前游戏状态:'+statusmsg);
+                        roomstatus[clientid].name = name;
+                        $('#current').text('当前id:'+clientid); 
+                        $('#number').text('当前房间人数:'+objtoarr(roomstatus).length);
+                        updateReady(roomstatus);
+                    });
+
+                    socket.on('updateReady',function(data){
+                        updateReady(data);     
                     });
 
                     socket.on('system',function(json){
+                        if(json.type == 'updateReady'){
+                            updateReady(json.data);     
+                        }
                         if(json.type == 'reopen' || json.type == 'reload'){
                             location.reload(); 
                         }
@@ -98,12 +116,7 @@
                                 var users = objtoarr(data);
                                 $('#number').text('当前房间人数:'+users.length);
                             }); 
-                            var ret = '';
-                            var roomstatus = json.data;
-                            for(var i in roomstatus){
-                                ret += i+':'+(roomstatus[i].isready ? '已准备': '未准备') + '<br>'; 
-                            }
-                            $('#userstatus').html(ret);
+                            updateReady(json.data);
                         }
                     });
 

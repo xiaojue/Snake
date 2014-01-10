@@ -37,11 +37,24 @@ function objtoarr(obj) {
 }
 
 var roomstatus = {};
+/*
 var gamestatus = false;
 var roommax = 5;
+*/
 
 //游戏房间逻辑部分
 io.sockets.on('connection', function(socket) {
+    /*
+    if(objtoarr(roomstatus).length === 0) gamestatus = false;
+
+    if(gamestatus){
+        socket.emit('loading');
+    }
+
+    if(objtoarr(roomstatus).length > roommax){
+        socket.emit('max');
+    }
+    */
 
 	var id = new Date().valueOf();
 
@@ -49,20 +62,15 @@ io.sockets.on('connection', function(socket) {
 		id: id,
 		isready: false
 	};
-    /*
-    if(objtoarr(roomstatus).length > roommax){
-        socket.emit('');
-        return;
-    }
-    */
+
 
 	socket.emit('open', {
 		id: id,
-		roomstatus: roomstatus,
-		status: gamestatus
+		roomstatus: roomstatus
 	});
 
     socket.on('gameover',function(){
+        //gamestatus = false;
         socket.broadcast.emit('system',{type:'reload'}); 
     });
 
@@ -77,10 +85,10 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('reopen',function(){
         socket.broadcast.emit('system',{type:'reopen'}); 
+        gamestatus = false;
     });
 
 	socket.on('serverinit', function(serverid) {
-		//delete roomstatus[serverid];
         roomstatus = {};
 	});
 
@@ -90,6 +98,8 @@ io.sockets.on('connection', function(socket) {
 
 	socket.on('isready', function(id) {
 		roomstatus[id].isready = true;
+        socket.broadcast.emit('system',{type:'updateReady',data:roomstatus});
+        socket.emit('updateReady',roomstatus);
 		var allready = true;
 		for (var i in roomstatus) {
 			if (!roomstatus[i].isready) {
@@ -101,14 +111,6 @@ io.sockets.on('connection', function(socket) {
 			type: 'allready'
 		});
 	});
-
-	socket.on('start', function(data) {
-
-	});
-	socket.on('stop', function(data) {
-
-	});
-
 	socket.on('top', function() {
 		socket.broadcast.emit('system', {
 			type: 'top',
@@ -152,6 +154,10 @@ io.sockets.on('connection', function(socket) {
                 roomstatus:roomstatus
             }
 		});
+    });
+    socket.on('setname',function(data){
+        roomstatus[data.id].name = data.name; 
+        socket.broadcast.emit('system',{type:'updateReady',data:roomstatus});
     });
 });
 
