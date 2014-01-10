@@ -40,9 +40,24 @@
            socket.emit('died',data.name);  
         });
 
+        function showRank(){
+            var ret ='';
+            for(var i in snake.playerScores){
+               var score = snake.playerScores[i].scores;
+               ret += i +'：'+score+'<br>';
+            }  
+            $('#currentrank').html(ret);
+        }
+
+        snake.bind('eat','room',function(){
+           showRank();  
+        });
+
         snake.bind('gameover','room',function(data){
            socket.emit('gameover');  
-           location.reload();
+           setTimeout(function(){
+             location.reload();
+           },3000);
         });
 
 		socket.on('system', function(json) {
@@ -74,6 +89,8 @@
 					if (s === 0) {
 						clearInterval(T);
 						snake.run();
+                        //显示分数
+                        showRank();
 					}
 				},
 				1000);
