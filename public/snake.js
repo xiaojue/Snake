@@ -68,6 +68,8 @@
 
         players : {},
 
+        playerIds : [],
+
         alives : 0,
 
         setKey :  function(l,t){
@@ -222,6 +224,7 @@
         },
 
         addPlayer : function(player){
+
             var _player = {
                 length : 2, //初始长度
                 direction : 'left',//初始方向
@@ -231,9 +234,12 @@
                 baseScore : 1,
             };
             var cfg = this.config();
-            var item = extend(_playear,player || {});
-
+            var item = extend(_player,player || {});
+            if(this.playerIds.length >= cfg.maxUsers) {
+                return;
+            }
             if(!this.players[item.name]) {
+                
                 this.players[item.name] = {
                     snake : {
                         cssName : item.cssName,
@@ -245,8 +251,14 @@
                     name : item.name,
                     scores : item.scores,
                     baseScore : item.baseScore, //分数倍数
-                    id : this.alives + 1
                 };
+                for(var i = 0; i< cfg.maxUsers, i++) {
+                    if(!this.playerIds[i]) {
+                        this.playerIds[i] = this.players[item.name];
+                        this.players[item.name].id = i;
+                        break;
+                    }
+                }  
                 this.alives ++;
                 this.evtFire('addplayer',[this.players]);
             }
