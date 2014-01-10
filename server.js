@@ -28,38 +28,49 @@ app.get('/handle', function(req, res, next) {
 	res.render('handle');
 });
 
+var roomstatus = {};
 
 //游戏房间逻辑部分
-var roomusers = [];
-var uuid = 1;
-
 io.sockets.on('connection', function(socket) {
 
-    //初始化房间参数，告诉客户端信息
-    socket.emit('adduser',function(){
-        uuid ++;
-        roomusers.push({id:uuid});
-        socket.emit('status',roomusers);
+    var id = new Date().valueOf();
+
+    roomstatus[id] = {};
+
+    socket.emit('open',{
+        id:id,
+        roomstatus:roomstatus
+    });
+
+    socket.broadcast.emit('system',{
+        type:'new'
+    });
+
+    socket.on('status',function(fn){
+        fn(roomstatus); 
     });
 
 	socket.on('start', function(data) {
-
 	});
 	socket.on('stop', function(data) {
-
 	});
 	socket.on('top', function() {
-
 	});
 	socket.on('right', function() {});
 	socket.on('down', function() {});
 	socket.on('left', function() {});
+    socket.on('disconnect', function() {
+        delete roomstatus[id];
+        socket.broadcast.emit('system',{
+            type:'disconnect',
+            data:id
+        });
+    });
 });
 
-io.sockets.on('disconnect', function() {
 
-});
 
 server.listen(port);
 
 console.log('view 127.0.0.1:' + port);
+
