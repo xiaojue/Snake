@@ -95,7 +95,7 @@
                             socket.emit('setname',{id:clientid,name:name}); 
                         }
                         roomstatus[clientid].name = name;
-                        $('#current').text('当前id:'+clientid); 
+                        $('#current').text('当前id:'+name); 
                         $('#number').text('当前房间人数:'+objtoarr(roomstatus).length);
                         updateReady(roomstatus);
                     });
