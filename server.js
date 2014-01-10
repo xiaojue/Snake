@@ -28,33 +28,73 @@ app.get('/handle', function(req, res, next) {
 	res.render('handle');
 });
 
+function objtoarr(obj) {
+	var ret = [];
+	for (var i in obj) {
+		ret.push(obj[i]);
+	}
+	return ret;
+}
+
 var roomstatus = {};
-var x=10;y=10;
+var gamestatus = false;
+var roommax = 5;
 
 //游戏房间逻辑部分
 io.sockets.on('connection', function(socket) {
 
-    var id = new Date().valueOf();
-    x++;
-    y++;
+	var id = new Date().valueOf();
 
-    roomstatus[id] = {
-        id:id,
-        head:[x,y]
-    };
+	roomstatus[id] = {
+		id: id,
+		isready: false,
+        backup:false
+	};
 
-    socket.emit('open',{
-        id:id,
-        roomstatus:roomstatus
+    if(objtoarr(roomstatus).length > roommax){
+        roomstatus.backup = true; 
+    }
+
+	socket.emit('open', {
+		id: id,
+		roomstatus: roomstatus,
+		status: gamestatus
+	});
+
+    socket.on('gameover',function(users){
+         
     });
 
-    socket.broadcast.emit('system',{
-        type:'new'
+	socket.broadcast.emit('system', {
+		type: 'new',
+        data:roomstatus
+	});
+
+    socket.on('reopen',function(){
+        socket.broadcast.emit('system',{type:'reopen'}); 
     });
 
-    socket.on('status',function(fn){
-        fn(roomstatus); 
-    });
+	socket.on('serverinit', function(serverid) {
+		delete roomstatus[serverid];
+	});
+
+	socket.on('status', function(fn) {
+		fn(roomstatus);
+	});
+
+	socket.on('isready', function(id) {
+		roomstatus[id].isready = true;
+		var allready = true;
+		for (var i in roomstatus) {
+			if (!roomstatus[i].isready) {
+				allready = false;
+				break;
+			}
+		}
+		if (allready) socket.broadcast.emit('system', {
+			type: 'allready'
+		});
+	});
 
 	socket.on('start', function(data) {
 
@@ -64,39 +104,45 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('top', function() {
-        socket.broadcast.emit('system',{
-            type:'top',
-            data:roomstatus[id]
-        });
+		socket.broadcast.emit('system', {
+			type: 'top',
+			data: roomstatus[id]
+		});
 	});
 	socket.on('right', function() {
-        socket.broadcast.emit('system',{
-            type:'right',
-            data:roomstatus[id]
-        });
-    });
+		socket.broadcast.emit('system', {
+			type: 'right',
+			data: roomstatus[id]
+		});
+	});
 	socket.on('down', function() {
-        socket.broadcast.emit('system',{
-            type:'down',
-            data:roomstatus[id]
-        });
-    });
+		socket.broadcast.emit('system', {
+			type: 'down',
+			data: roomstatus[id]
+		});
+	});
 	socket.on('left', function() {
-        socket.broadcast.emit('system',{
-            type:'left',
-            data:roomstatus[id]
-        });
-    });
-    socket.on('disconnect', function() {
-        delete roomstatus[id];
-        socket.broadcast.emit('system',{
-            type:'disconnect',
-            data:id
-        });
-    });
+		socket.broadcast.emit('system', {
+			type: 'left',
+			data: roomstatus[id]
+		});
+	});
+	socket.on('disconnect', function() {
+		delete roomstatus[id];
+        if(objtoarr(roomstatus).length === 0){
+		    socket.broadcast.emit('system', {
+                type:'allout'
+            });
+        }
+		socket.broadcast.emit('system', {
+			type: 'disconnect',
+			data: {
+                id:id,
+                roomstatus:roomstatus
+            }
+		});
+	});
 });
-
-
 
 server.listen(port);
 
