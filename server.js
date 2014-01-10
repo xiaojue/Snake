@@ -57,25 +57,25 @@ io.sockets.on('connection', function(socket) {
 
 	});
 
-	socket.on('top', function(id) {
+	socket.on('top', function() {
         socket.broadcast.emit('system',{
             type:'top',
             id:id 
         });
 	});
-	socket.on('right', function(id) {
+	socket.on('right', function() {
         socket.broadcast.emit('system',{
             type:'right',
             id:id 
         });
     });
-	socket.on('down', function(id) {
+	socket.on('down', function() {
         socket.broadcast.emit('system',{
             type:'down',
             id:id 
         });
     });
-	socket.on('left', function(id) {
+	socket.on('left', function() {
         socket.broadcast.emit('system',{
             type:'left',
             id:id 
