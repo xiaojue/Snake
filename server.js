@@ -47,13 +47,14 @@ io.sockets.on('connection', function(socket) {
 
 	roomstatus[id] = {
 		id: id,
-		isready: false,
-        backup:false
+		isready: false
 	};
-
+    /*
     if(objtoarr(roomstatus).length > roommax){
-        roomstatus.backup = true; 
+        socket.emit('');
+        return;
     }
+    */
 
 	socket.emit('open', {
 		id: id,
