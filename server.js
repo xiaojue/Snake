@@ -28,10 +28,20 @@ app.get('/handle', function(req, res, next) {
 	res.render('handle');
 });
 
+
+//游戏房间逻辑部分
+var roomusers = [];
+var uuid = 1;
+
 io.sockets.on('connection', function(socket) {
-	socket.on('add', function(data) {
-		console.log(data);
-	});
+
+    //初始化房间参数，告诉客户端信息
+    socket.emit('adduser',function(){
+        uuid ++;
+        roomusers.push({id:uuid});
+        socket.emit('status',roomusers);
+    });
+
 	socket.on('start', function(data) {
 
 	});
@@ -44,6 +54,10 @@ io.sockets.on('connection', function(socket) {
 	socket.on('right', function() {});
 	socket.on('down', function() {});
 	socket.on('left', function() {});
+});
+
+io.sockets.on('disconnect', function() {
+
 });
 
 server.listen(port);
