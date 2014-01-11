@@ -162,16 +162,20 @@
 				$('#number').text('当前房间人数' + objtoarr(json.data.roomstatus).length);
 				//如果一个用户掉了，要remove掉蛇实例
 			}
-			if (json.type == 'top') {
+			if (json.type == 'top' && gamestatus) {
+                $('<audio src="wav/touch.wav" autoplay></audio>');
 				snake.setDirection(snake.players[json.data.id].snake, 'up');
 			}
-			if (json.type == 'right') {
+			if (json.type == 'right' && gamestatus) {
+                $('<audio src="wav/touch.wav" autoplay></audio>');
 				snake.setDirection(snake.players[json.data.id].snake, 'right');
 			}
-			if (json.type == 'down') {
+			if (json.type == 'down' && gamestatus) {
+                $('<audio src="wav/touch.wav" autoplay></audio>');
 				snake.setDirection(snake.players[json.data.id].snake, 'down');
 			}
-			if (json.type == 'left') {
+			if (json.type == 'left' && gamestatus) {
+                $('<audio src="wav/touch.wav" autoplay></audio>');
 				snake.setDirection(snake.players[json.data.id].snake, 'left');
 			}
 		});
