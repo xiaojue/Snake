@@ -12,7 +12,9 @@
 		window.snake = new Snake;
 
 		snake.config({
-			containerId: 'hehe'
+			containerId: 'hehe',
+            columns : 35,
+            rows : 25
 		});
 
 		var serverid;
@@ -74,22 +76,18 @@
         }
 
         snake.bind('eat','room',function(){
-                $('<audio src="wav/eat.wav" autoplay></audio>');
+                $('<audio src="wav/eat.mp3" autoplay></audio>');
         });
 
         snake.bind('died','room',function(){
-                $('<audio src="wav/died.wav" autoplay></audio>');
+                if(snake.alives != 0) {
+                    $('<audio src="wav/died.wav" autoplay></audio>');
+                }
         });
         
-        var back; 
         snake.bind('start','room',function(){
             back = $('<audio src="wav/back.wav" autoplay loop></audio>');
         });
-
-        snake.bind('gameover','room',function(){
-            back.remove();
-            $('<audio src="wav/gameover.wav" autoplay></audio>');
-        })
 
         snake.bind('starting','room',function(){//加状态显示
                 var ret = '';
@@ -107,11 +105,17 @@
                 }
                 $('#buffstatus').html(ret);
         });
-
+        
+        var back; 
         snake.bind('gameover','room',function(){
-           showRank();
-           socket.emit('gameover');  
-           location.reload();
+            back && back.attr('src','').remove(true);
+            back = null;
+            $('<audio src="wav/gameover.mp3" autoplay></audio>');
+            setTimeout(function(){
+                showRank();
+                location.reload();
+            },1000)
+            socket.emit('gameover'); 
         });
 
 		socket.on('system', function(json) {
