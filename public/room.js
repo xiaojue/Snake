@@ -20,7 +20,7 @@
         snake.loadAllFood();
 		snake.init();
 
-		var socket = io.connect('http://172.16.121.168:5566');
+		var socket = io.connect('http://172.16.121.205:5566');
 		//初始化房间信息- 剔除server id
 		socket.on('open', function(data) {
 			//console.log(data.roomstatus);
@@ -35,7 +35,7 @@
         function updateReady(roomstatus){
 			var ret = '';
 			for (var i in roomstatus) {
-				ret += roomstatus[i].name + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
+                if(roomstatus[i].name) ret += roomstatus[i].name + ':' + (roomstatus[i].isready ? '已准备': '未准备') + '<br>';
 			}
 			$('#userstatus').html(ret);
         }
@@ -60,8 +60,7 @@
             var ret = [];
             for(var i in snake.__foodPlugins) {
                 var item = snake.__foodPlugins[i];
-                ret.push('<span class="' , item.cssName , '" style="display:inline-block;height:', unit ,'; width : ', unit ,'"></span>'
-                     ,'<span style="display:inline-block">',item.info,'</span><br/>')
+                ret.push('<span class="' , item.cssName , '" style="display:inline-block;height:', unit ,'; width : ', unit ,'"></span>' ,'<span style="display:inline-block">',item.info,'</span><br/>');
             }
             $('#pluginInfo').html(ret.join(''));
         }
@@ -89,7 +88,7 @@
 
         snake.bind('gameover','room',function(data){
            socket.emit('gameover');  
-           alert('game over!')
+           alert('game over!');
 
            //setTimeout(function(){
              location.reload();
