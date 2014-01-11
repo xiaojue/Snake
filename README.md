@@ -4,7 +4,7 @@ Snake
 多人在线贪吃蛇
 
 ```bash
-$ git clone http://gitlab.com/qiang/snake.git
+$ git clone http://gitlab.com/qiang/snake.git (https://github.com/xiaojue/Snake)
 $ cd Snake
 $ npm install -d 
 ```
