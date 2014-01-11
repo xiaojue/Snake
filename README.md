@@ -15,4 +15,4 @@ $ npm install -d
 
 客户端可扫描下图，直接用微博客户端打开游戏。
 
-[![扫描进入客户端](https://github.com/xiaojue/Snake/cli.png)]
+[![扫描进入客户端](https://raw2.github.com/xiaojue/Snake/master/cli.png)]
