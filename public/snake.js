@@ -197,6 +197,7 @@
                 info : '基本的食物,＋1长度，＋'+ cfg.score + '分'
             },json || {});
             this.__foodPlugins.unshift(_json);
+            this.__hasPlugin[_json.name] = _json;
         },
         
         createFood : function(c){
@@ -229,6 +230,7 @@
         },
         eatFood : function(player,snake,food){
             var cfg = this.config();
+            console.log(food.plugin.name);
             var plugin = extend({},this.__hasPlugin[food.plugin.name]);
             this.removeFood(food);
             var eated = plugin.effect.apply(this,arguments);
@@ -449,7 +451,7 @@
                     
                     var maybeFood = this.__fill[this.setKey(l,t)],eated = false;
                     if(this.__isDied[this.setKey(l,t)] || !maybeFood) {
-                        console.info('game over');
+                        console.log('game over');
                         player.snake.status = 'died';
                         return ;
                     }
