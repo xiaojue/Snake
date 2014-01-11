@@ -163,20 +163,28 @@
 				//如果一个用户掉了，要remove掉蛇实例
 			}
 			if (json.type == 'top' && gamestatus) {
-                $('<audio src="wav/touch.wav" autoplay></audio>');
-				snake.setDirection(snake.players[json.data.id].snake, 'up');
-			}
+                if(snake.players[json.data.id]) {
+                    $('<audio src="wav/touch.wav" autoplay></audio>');
+                    snake.setDirection(snake.players[json.data.id].snake, 'up');
+			    }
+            }
 			if (json.type == 'right' && gamestatus) {
-                $('<audio src="wav/touch.wav" autoplay></audio>');
-				snake.setDirection(snake.players[json.data.id].snake, 'right');
-			}
+                if(snake.players[json.data.id]) {
+                    $('<audio src="wav/touch.wav" autoplay></audio>');
+                    snake.setDirection(snake.players[json.data.id].snake, 'right');
+			    }
+            }
 			if (json.type == 'down' && gamestatus) {
-                $('<audio src="wav/touch.wav" autoplay></audio>');
-				snake.setDirection(snake.players[json.data.id].snake, 'down');
+                if(snake.players[json.data.id]) {
+                    $('<audio src="wav/touch.wav" autoplay></audio>');
+                    snake.setDirection(snake.players[json.data.id].snake, 'down');
+                }
 			}
 			if (json.type == 'left' && gamestatus) {
-                $('<audio src="wav/touch.wav" autoplay></audio>');
-				snake.setDirection(snake.players[json.data.id].snake, 'left');
+                if(snake.players[json.data.id]) {
+                    $('<audio src="wav/touch.wav" autoplay></audio>');
+				    snake.setDirection(snake.players[json.data.id].snake, 'left');
+                }
 			}
 		});
 	});
