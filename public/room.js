@@ -73,11 +73,23 @@
             $('#pluginInfo').html(ret.join(''));
         }
 
-        /*
         snake.bind('eat','room',function(){
-           showRank();  
+                $('<audio src="wav/eat.wav" autoplay></audio>');
         });
-        */
+
+        snake.bind('died','room',function(){
+                $('<audio src="wav/died.wav" autoplay></audio>');
+        });
+        
+        var back; 
+        snake.bind('start','room',function(){
+            back = $('<audio src="wav/back.wav" autoplay loop></audio>');
+        });
+
+        snake.bind('gameover','room',function(){
+            back.remove();
+            $('<audio src="wav/gameover.wav" autoplay></audio>');
+        })
 
         snake.bind('starting','room',function(){//加状态显示
                 var ret = '';
