@@ -30,8 +30,8 @@
     }
     var Snake = function(cfg){
         var _default = {
-            columns : 25,
-            rows : 25,
+            columns : 20,
+            rows : 20,
             unitLength : 20,
             containerId : '',
             defCss : 'snake',
@@ -39,7 +39,7 @@
             allowBack : false,
             speed : 400,
             score : 5, //每吃一个食物所加的分数,
-            range : 35, //出现特殊食物的机率
+            range : 25, //出现特殊食物的机率
             maxUsers : 5
         };
 
@@ -230,7 +230,6 @@
         },
         eatFood : function(player,snake,food){
             var cfg = this.config();
-            console.log(food.plugin.name);
             var plugin = extend({},this.__hasPlugin[food.plugin.name]);
             this.removeFood(food);
             var eated = plugin.effect.apply(this,arguments);
@@ -303,7 +302,7 @@
                 return;
             }
             if(!this.players[item.name]) {
-                this.playerScores[item.name] = item.scores
+                this.playerScores[item.name] = item.scores;
                 this.players[item.name] = {
                     snake : {
                         cssName : item.cssName,
@@ -410,6 +409,29 @@
                 cssName : 'd',
                 info : '（格子总数／25）步内吃到的食物分数加倍'
             });
+            this.regFood({
+                name : 'tomato',
+                fp : 80,
+                disFp : 20,
+                effect : function(player,snake,food){
+                    this.bind('starting','_tomato'+ player.name,function(p,s,n,k){
+                        if(player.name == p.name && player.snake.status != 'died') {
+                            if(!n  || this.__isDied[k]) {
+                                player.snake.status =  'stop' ; 
+                            }  else {
+                                player.snake.status = 'alive' 
+                            }
+                        }
+                    })
+                },
+                unEffect : function(player,snake){
+                    this.unbind('starting','_tomato' + player.name);
+                    snake.status =  'alive' ;
+                },
+                score : 0,
+                cssName : 'e',
+                info : '在80步内遇到阻碍会等待.`'
+            });
         },
 
         snakeMove : function(){
@@ -424,49 +446,50 @@
                 if(!player) {
                     continue;
                 }
+
+                var snake = player.snake.body;
+                var nextHead,l,t;
+                if(player.snake._direction) {
+                    player.snake._oldDirection = player.snake.direction;
+                    player.snake.direction = player.snake._direction;
+                    player.snake._direction = null;
+                }
+                switch(player.snake.direction) {
+                    case 'up' :
+                        l =  snake[0]._offset.left;
+                        t =  snake[0]._offset.top - 1
+                    break;
+                    case 'down' : 
+                        l =  snake[0]._offset.left;
+                        t =  snake[0]._offset.top + 1
+                    break;
+                    case 'left' : 
+                        l =  snake[0]._offset.left -1;
+                        t =  snake[0]._offset.top
+                    break;
+                    case 'right' : 
+                        l =  snake[0]._offset.left +1;
+                        t =  snake[0]._offset.top
+                    break;
+                }
+                var maybeFood = this.__fill[this.setKey(l,t)],eated = false;
+                this.evtFire('starting',[player,snake, maybeFood,this.setKey(l,t)]);
+                for(var pluginName in player.buff) {
+                    var buff = player.buff[pluginName];
+                    if(buff) {
+                        if(buff.fp == 0 && typeof buff.unEffect == 'function') {
+                            buff.unEffect.apply(this,[player,player.snake]);
+                            buff[pluginName] = undefined;
+                            delete buff[pluginName];
+                        } 
+                        buff.fp --;
+                    }
+                }
                 if(player.snake.status == 'alive') {
-                    var snake = player.snake.body;
-                    var nextHead,l,t;
-                    if(player.snake._direction) {
-                        player.snake.direction = player.snake._direction;
-                        player.snake._direction = null;
-                    }
-                    switch(player.snake.direction) {
-                        case 'up' :
-                            l =  snake[0]._offset.left;
-                            t =  snake[0]._offset.top - 1
-                        break;
-                        case 'down' : 
-                            l =  snake[0]._offset.left;
-                            t =  snake[0]._offset.top + 1
-                        break;
-                        case 'left' : 
-                            l =  snake[0]._offset.left -1;
-                            t =  snake[0]._offset.top
-                        break;
-                        case 'right' : 
-                            l =  snake[0]._offset.left +1;
-                            t =  snake[0]._offset.top
-                        break;
-                    }
-                    
-                    var maybeFood = this.__fill[this.setKey(l,t)],eated = false;
                     if(this.__isDied[this.setKey(l,t)] || !maybeFood) {
                         console.log('game over');
                         player.snake.status = 'died';
                         return ;
-                    }
-                    
-                    for(var pluginName in player.buff) {
-                        var buff = player.buff[pluginName];
-                        if(buff) {
-                            if(buff.fp == 0 && typeof buff.unEffect == 'function') {
-                                buff.unEffect.apply(this,[player,player.snake]);
-                                buff[pluginName] = undefined;
-                                delete buff[pluginName];
-                            } 
-                            buff.fp --;
-                        }
                     }
                     
                     if(maybeFood && maybeFood.plugin) { //吃食物
@@ -500,7 +523,6 @@
                 clearInterval(this.__timer);
             }
             _t.__timer = setInterval(function(){
-                _t.evtFire('starting');
                 _t.snakeMove();
             },cfg.speed);
         },
@@ -511,7 +533,7 @@
         },
         setDirection : function(snake,direction) { //设置移动方向
             var cfg  = this.config();
-            if(snake.status != 'alive') {
+            if(!snake || snake.status == 'died') {
                 return;
             }
             var oldD = snake.direction, newD = direction;
@@ -521,7 +543,7 @@
                 'down' : 3,
                 'right' : 4
             };
-
+            
             if(!rule[newD]) {
                 return false;
             }
