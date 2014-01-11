@@ -58,7 +58,6 @@
 
         function showTips() {
             var ret = [];
-            console.info(snake.__foodPlugins);
             for(var i in snake.__foodPlugins) {
                 var item = snake.__foodPlugins[i];
                 ret.push('<span class="' , item.cssName , '" style="display:inline-block;height:', unit ,'; width : ', unit ,'"></span>'
@@ -73,21 +72,19 @@
         });
 
         snake.bind('starting','room',function(){//加状态显示
-                //var ret = '';
-                //for(var i in snake.players) {
-                //    ret += '<p class='+snake.players[i].snake.cssName+'">'+i+':</p>';
-                //    if(snake.players[i].buff) {
-                //        console.info(snake.players[i].buff)
-                //        for(var ef in snake.players[i].buff) {
-                //            var buff = snake.players[i].buff[ef];
-                //            if(buff.fp >0 && typeof buff.unEffect == 'function') {
-                //                console.info(buff.fp);
-                //                ret+= ('<span class="' + snake.__foodPlugins[ef].cssName + '" style="display:inline-block;height:'+ unit +'; width : '+ unit +'"></span>');
-                //            }
-                //        } 
-                //    }
-                //}
-                //$('#buffstatus').html(ret);
+                var ret = '';
+                for(var i in snake.players) {
+                    ret += '<p class='+snake.players[i].snake.cssName+'">'+i+':</p>';
+                    if(snake.players[i].buff) {
+                        for(var ef in snake.players[i].buff) {
+                            var buff = snake.players[i].buff[ef];
+                            if(buff.fp >0 && typeof buff.unEffect == 'function') {
+                                ret+= ('<span class="' + snake.__hasPlugin[ef].cssName + '" style="display:inline-block;height:'+ unit +'; width : '+ unit +'"></span>' +  buff.fp);
+                            }
+                        } 
+                    }
+                }
+                $('#buffstatus').html(ret);
         })
 
         snake.bind('gameover','room',function(data){

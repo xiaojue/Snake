@@ -39,7 +39,7 @@
             allowBack : false,
             speed : 400,
             score : 5, //每吃一个食物所加的分数,
-            range : 0, //出现特殊食物的机率
+            range : 35, //出现特殊食物的机率
             maxUsers : 5
         };
 
@@ -173,9 +173,9 @@
         },
         
         regFood : function(o){
-            if( this.__hasPlugin[o.name] != 1) {
+            if( !this.__hasPlugin[o.name]) {
                 this.__foodPlugins.push(o);
-                this.__hasPlugin[o.name] = 1
+                this.__hasPlugin[o.name] = o;
             }
         },
         
@@ -208,7 +208,7 @@
                 _food.shift();
                 plugin = randomArray(_food);
             } else {
-                plugin = this.__foodPlugins[3]; 
+                plugin = this.__foodPlugins[0]; 
             }
             var fBody = this.randomBlock(plugin.cssName);
             fBody.plugin = plugin;
@@ -229,7 +229,7 @@
         },
         eatFood : function(player,snake,food){
             var cfg = this.config();
-            var plugin = extend({},food.plugin);
+            var plugin = extend({},this.__hasPlugin[food.plugin.name]);
             this.removeFood(food);
             var eated = plugin.effect.apply(this,arguments);
             if(plugin.fp > 0 && typeof plugin.unEffect == 'function') {
@@ -393,11 +393,11 @@
             });
             this.regFood({
                 name : 'apple',
-                fp : 25 * _t.alives,
+                fp : parseInt((cfg.columns*cfg.rows)/25),
                 disFp : 20,
                 effect : function(player,snake,food){
                     var cfg = this.config();
-                    player.baseScore =  2; 
+                    player.baseScore =  2;
                 },
                 unEffect : function(player,snake){
                     var cfg = this.config();
@@ -405,7 +405,7 @@
                 },
                 score : 0,
                 cssName : 'd',
-                info : '（25 * 当前玩家数）步内吃到的食物分数加倍'
+                info : '（格子总数／25）步内吃到的食物分数加倍'
             });
         },
 
@@ -454,17 +454,17 @@
                         return ;
                     }
                     
-                    //for(var pluginName in player.buff) {
-                    //    var buff = player.buff[pluginName];
-                    //    if(buff) {
-                    //        if(buff.fp == 0 && typeof buff.unEffect == 'function') {
-                    //            buff.unEffect.apply(this,[player,player.snake]);
-                    //            buff[pluginName] = undefined;
-                    //            delete buff[pluginName];
-                    //        } 
-                    //        buff.fp --;
-                    //    }
-                    //}
+                    for(var pluginName in player.buff) {
+                        var buff = player.buff[pluginName];
+                        if(buff) {
+                            if(buff.fp == 0 && typeof buff.unEffect == 'function') {
+                                buff.unEffect.apply(this,[player,player.snake]);
+                                buff[pluginName] = undefined;
+                                delete buff[pluginName];
+                            } 
+                            buff.fp --;
+                        }
+                    }
                     
                     if(maybeFood && maybeFood.plugin) { //吃食物
                         eated = this.eatFood(player,player.snake,maybeFood);
