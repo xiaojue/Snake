@@ -17,6 +17,7 @@
 
 		var serverid;
         var gamestatus;
+        var roomdata;
         snake.loadAllFood();
 		snake.init();
 
@@ -55,12 +56,12 @@
             sort.sort(function(a,b){
                 return a.score > b.score;
             });
-            /*
             for(var j=0;j< sort.length;j++){
-                ret += snake.players[sort[j]['id']].name + '得分:'+sort[j]['score']+'\r\n';
+                var id = sort[j]['id'];
+                console.log(id);
+                ret += roomdata[id].name + ' 得分: '+sort[j]['score']+'\r\n';
             }
-            */
-            alert(sort.length);
+            alert(ret);
         }
 
         function showTips() {
@@ -81,7 +82,7 @@
         snake.bind('starting','room',function(){//加状态显示
                 var ret = '';
                 for(var i in snake.players) {
-                    ret += '<p class='+snake.players[i].snake.cssName+'">'+i+':</p>';
+                    ret += '<p>'+roomdata[i].name+'的buff : <br>';
                     if(snake.players[i].buff) {
                         for(var ef in snake.players[i].buff) {
                             var buff = snake.players[i].buff[ef];
@@ -90,6 +91,7 @@
                             }
                         } 
                     }
+                    ret += '</p>';
                 }
                 $('#buffstatus').html(ret);
         });
@@ -102,6 +104,7 @@
 
 		socket.on('system', function(json) {
             if(json.type == 'updateReady'){
+                roomdata = json.data;
                 updateReady(json.data);     
             }
 			if (json.type == 'new') {
@@ -138,7 +141,7 @@
 			}
 			if (json.type === 'disconnect') {
 				//判断全离线 初始化
-				alert('id ' + json.data.roomstatus[json.data.id] + ' is out');
+				//alert('id ' + json.data.roomstatus[json.data.id] + ' is out');
                 snake.removePlayer(json.data.id);
 				$('#number').text('当前房间人数' + objtoarr(json.data.roomstatus).length);
 				//如果一个用户掉了，要remove掉蛇实例
