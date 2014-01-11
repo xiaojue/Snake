@@ -303,6 +303,7 @@
                 return;
             }
             if(!this.players[item.name]) {
+                this.playerScores[item.name] = item.scores
                 this.players[item.name] = {
                     snake : {
                         cssName : item.cssName,
