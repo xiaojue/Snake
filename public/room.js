@@ -54,7 +54,7 @@
                 sort.push({score:score,id:i});
             }  
             sort.sort(function(a,b){
-                return a.score > b.score;
+                return a.score < b.score;
             });
             for(var j=0;j< sort.length;j++){
                 var id = sort[j]['id'];
